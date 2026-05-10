@@ -2,367 +2,869 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚒 FIRE DRILL BIG WHEEL - Work of Search</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        body {
-            margin: 0; padding: 20px 10px;
-            background: linear-gradient(#111, #300);
-            color: #ff0;
-            font-family: 'Press Start 2P', system-ui;
-            text-align: center;
-            min-height: 100vh;
-        }
-        h1 { margin: 15px 0 5px; text-shadow: 0 0 20px #f00; font-size: 2.1rem; }
-        .subtitle { color: #f80; margin-bottom: 10px; }
-        canvas { 
-            border: 18px solid #c00; 
-            border-radius: 50%; 
-            box-shadow: 0 0 50px #ff0, inset 0 0 60px #600; 
-            margin: 15px auto; 
-            display: block; 
-            background: #000;
-        }
-        button {
-            font-family: 'Press Start 2P', system-ui;
-            font-size: 1.3rem; padding: 15px 35px; margin: 8px;
-            background: #c00; color: white; border: 4px solid #ff0;
-            cursor: pointer; text-shadow: 2px 2px 0 #000; box-shadow: 0 8px 0 #600;
-        }
-        button:active { transform: translateY(4px); box-shadow: 0 4px 0 #600; }
-        #spinBtn { font-size: 2.1rem; padding: 25px 70px; background: #f00; }
-        .modal {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.95); align-items: center; justify-content: center; z-index: 100;
-        }
-        .modal-content {
-            background: #111; border: 8px solid #f00; padding: 25px; max-width: 94%;
-            color: #ff0; box-shadow: 0 0 30px #f00; max-height: 92vh; overflow-y: auto;
-        }
-        .drill-name { font-size: 1.7rem; color: #0f0; margin: 15px 0; }
-        .close { position: absolute; top: 15px; right: 25px; font-size: 2.8rem; cursor: pointer; color: #f80; }
-        pre { white-space: pre-wrap; font-size: 0.82rem; text-align: left; background:#222; padding:10px; border-radius:4px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>🔥 FIRE DRILL WHEEL v3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap');
+:root{--red:#e02020;--orange:#f97316;--yellow:#fcd34d;--green:#22c55e;--dark:#0a0a0a;--dark3:#1a1a1a;--panel:#151515;--text:#f0f0f0;--muted:#888;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--dark);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:1000;}
+.header{text-align:center;padding:14px 10px 8px;}
+.header::after{content:'';display:block;height:2px;background:linear-gradient(90deg,transparent,var(--red),var(--orange),var(--red),transparent);margin-top:10px;}
+.header h1{font-family:'Black Ops One',sans-serif;font-size:clamp(1.4rem,4.5vw,2.6rem);letter-spacing:3px;background:linear-gradient(135deg,#fff 0%,var(--yellow) 40%,var(--orange) 70%,var(--red) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 12px rgba(249,115,22,0.4));}
+.subtitle{font-family:'Share Tech Mono',monospace;color:var(--orange);font-size:0.68rem;letter-spacing:4px;margin-top:3px;}
+.source-badges{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;margin-top:7px;}
+.badge{font-family:'Share Tech Mono',monospace;font-size:0.58rem;padding:2px 7px;border:1px solid #333;color:#666;letter-spacing:1px;}
+.badge.nfpa{border-color:#1d4ed8;color:#60a5fa;}.badge.ifsta{border-color:#065f46;color:#34d399;}.badge.wos{border-color:#991b1b;color:#f87171;}.badge.fsri{border-color:#6b21a8;color:#c084fc;}.badge.fe{border-color:#92400e;color:#fbbf24;}
+.stats-bar{display:flex;justify-content:center;flex-wrap:wrap;gap:16px;margin-top:6px;font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--muted);}
+.stats-bar span{color:var(--yellow);}
+.main-layout{display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px;max-width:900px;margin:0 auto;}
+.wheel-section{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;}
+.wheel-frame{position:relative;display:inline-block;}
+.wheel-glow{position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(220,38,38,0.15) 0%,transparent 70%);animation:pulseGlow 3s ease-in-out infinite;pointer-events:none;}
+@keyframes pulseGlow{0%,100%{opacity:0.5;transform:scale(1);}50%{opacity:1;transform:scale(1.05);}}
+canvas#wheel{display:block;border-radius:50%;border:3px solid #222;box-shadow:0 0 0 6px #1a1a1a,0 0 0 8px #2a2a2a,0 0 40px rgba(220,38,38,0.3);}
+.pointer-wrap{position:absolute;top:-18px;left:50%;transform:translateX(-50%);z-index:10;}
+.pointer{width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:44px solid var(--yellow);filter:drop-shadow(0 0 8px rgba(252,211,77,0.9));}
+.center-hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;background:radial-gradient(circle at 30% 30%,#333,#0a0a0a);border-radius:50%;border:4px solid var(--orange);box-shadow:0 0 20px rgba(249,115,22,0.5);display:flex;align-items:center;justify-content:center;font-size:1.6rem;z-index:5;cursor:pointer;}
+.btn-row{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;width:100%;}
+.btn{font-family:'Black Ops One',sans-serif;font-size:0.8rem;letter-spacing:1px;padding:8px 14px;border:2px solid;cursor:pointer;transition:all 0.15s;text-transform:uppercase;}
+.btn:active{transform:translateY(2px);}
+.btn-spin{font-size:1.3rem;padding:13px 44px;background:linear-gradient(135deg,#b91c1c,#dc2626,#ef4444);color:white;border-color:var(--yellow);box-shadow:0 6px 0 #7f1d1d;}
+.btn-spin:active{box-shadow:0 2px 0 #7f1d1d;}
+.btn-spin:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-secondary{background:var(--dark3);color:var(--orange);border-color:#333;}
+.btn-secondary:hover{border-color:var(--orange);}
+.btn-danger{background:var(--dark3);color:#ef4444;border-color:#333;}
+.filter-section{width:100%;background:var(--dark3);border:1px solid #222;padding:10px 12px;}
+.filter-label{font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:#555;letter-spacing:2px;margin-bottom:5px;}
+.filter-row{display:flex;flex-wrap:wrap;gap:4px;}
+.cat-btn{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:0.7rem;padding:3px 9px;border:1px solid #333;background:var(--dark);color:var(--muted);cursor:pointer;transition:all 0.15s;text-transform:uppercase;letter-spacing:1px;}
+.cat-btn.active{border-color:var(--orange);color:var(--orange);background:rgba(249,115,22,0.1);}
+.diff-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px;}
+.diff-btn{font-family:'Share Tech Mono',monospace;font-size:0.63rem;padding:3px 10px;border:1px solid #333;background:var(--dark);cursor:pointer;transition:all 0.15s;letter-spacing:1px;color:var(--muted);}
+.diff-btn.on-easy{border-color:var(--green);color:var(--green);background:rgba(34,197,94,0.1);}
+.diff-btn.on-medium{border-color:var(--yellow);color:var(--yellow);background:rgba(252,211,77,0.1);}
+.diff-btn.on-hard{border-color:var(--red);color:var(--red);background:rgba(220,38,38,0.1);}
+.drill-count{font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--muted);text-align:center;}
+.drill-count span{color:var(--green);font-size:0.85rem;}
+.lucky-tip{font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:#3a3a3a;text-align:center;letter-spacing:1px;margin-top:1px;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.93);z-index:500;align-items:center;justify-content:center;padding:12px;overflow-y:auto;}
+.overlay.open{display:flex;}
+.modal{background:var(--panel);border:1px solid #2a2a2a;border-top:3px solid var(--red);max-width:660px;width:100%;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 0 60px rgba(220,38,38,0.2);animation:slideUp 0.2s ease;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-header{padding:14px 50px 14px 18px;border-bottom:1px solid #222;background:linear-gradient(135deg,rgba(220,38,38,0.08),transparent);}
+.modal-badge{font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--orange);letter-spacing:3px;text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.src-tag{font-size:0.53rem;padding:1px 5px;border:1px solid;}
+.src-nfpa{border-color:#1d4ed8;color:#60a5fa;}.src-ifsta{border-color:#065f46;color:#34d399;}.src-wos{border-color:#991b1b;color:#f87171;}.src-fsri{border-color:#6b21a8;color:#c084fc;}.src-fe{border-color:#92400e;color:#fbbf24;}
+.modal-title{font-family:'Black Ops One',sans-serif;font-size:clamp(1.2rem,3.5vw,1.8rem);color:var(--yellow);letter-spacing:1px;line-height:1.1;}
+.modal-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.meta-chip{font-family:'Share Tech Mono',monospace;font-size:0.65rem;padding:3px 9px;border:1px solid #333;background:#1a1a1a;color:var(--muted);}
+.meta-chip.diff-Easy{border-color:var(--green);color:var(--green);}
+.meta-chip.diff-Medium{border-color:var(--yellow);color:var(--yellow);}
+.meta-chip.diff-Hard{border-color:var(--red);color:var(--red);}
+.modal-body{padding:14px 18px;}
+.section-label{font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--orange);letter-spacing:3px;text-transform:uppercase;margin-bottom:4px;margin-top:12px;}
+.section-label:first-child{margin-top:0;}
+.section-content{font-size:0.95rem;line-height:1.6;color:#ccc;}
+.equip-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:3px;}
+.equip-tag{font-size:0.76rem;padding:2px 8px;background:#1c1c1c;border:1px solid #2a2a2a;color:#aaa;}
+.exec-steps{counter-reset:step;list-style:none;padding:0;}
+.exec-steps li{counter-increment:step;display:flex;gap:10px;margin-bottom:7px;font-size:0.91rem;line-height:1.5;color:#ccc;}
+.exec-steps li::before{content:counter(step,decimal-leading-zero);font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--red);min-width:24px;padding-top:2px;}
+.close-btn{position:absolute;top:11px;right:13px;background:none;border:1px solid #333;color:#888;font-size:0.9rem;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:monospace;}
+.close-btn:hover{border-color:var(--red);color:var(--red);}
+.modal-footer{padding:11px 18px;border-top:1px solid #222;display:flex;gap:9px;justify-content:flex-end;}
+.history-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #1a1a1a;font-size:0.86rem;}
+.history-item:last-child{border-bottom:none;}
+.history-time{font-family:'Share Tech Mono',monospace;font-size:0.65rem;color:var(--muted);min-width:52px;}
+.history-cat{font-size:0.58rem;font-family:'Share Tech Mono',monospace;padding:2px 5px;border:1px solid #333;color:var(--orange);white-space:nowrap;}
+.form-group{margin-bottom:11px;}
+.form-group label{display:block;font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--orange);letter-spacing:2px;margin-bottom:3px;text-transform:uppercase;}
+.form-group input,.form-group textarea,.form-group select{width:100%;background:var(--dark3);border:1px solid #333;color:var(--text);padding:6px 10px;font-family:'Rajdhani',sans-serif;font-size:0.92rem;outline:none;}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--orange);}
+.form-group select option{background:#1a1a1a;}
+.form-group textarea{resize:vertical;min-height:60px;}
+.ticker{background:#0d0d0d;border-top:1px solid #1a1a1a;overflow:hidden;padding:5px 0;margin-top:6px;}
+.ticker-inner{display:flex;gap:60px;animation:ticker 50s linear infinite;white-space:nowrap;}
+.ticker-inner span{font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:#3a3a3a;letter-spacing:1px;}
+.ticker-inner span strong{color:#7f1d1d;}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:#111;}
+::-webkit-scrollbar-thumb{background:#333;border-radius:3px;}
+
+.mode-toggle-row{display:flex;justify-content:center;margin-bottom:4px;}
+.mode-toggle{font-family:'Black Ops One',sans-serif;font-size:0.78rem;letter-spacing:2px;padding:8px 22px;border:2px solid #333;background:var(--dark);color:var(--muted);cursor:pointer;transition:all 0.2s;text-transform:uppercase;position:relative;overflow:hidden;}
+.mode-toggle.sets-active{border-color:#22c55e;color:#22c55e;background:rgba(34,197,94,0.08);box-shadow:0 0 16px rgba(34,197,94,0.2);}
+.mode-toggle:not(.sets-active){border-color:#444;color:#666;}
+.mode-toggle:not(.sets-active):hover{border-color:var(--orange);color:var(--orange);}
+.sets-badge{display:none;font-family:'Share Tech Mono',monospace;font-size:0.6rem;text-align:center;letter-spacing:2px;margin-bottom:2px;color:#22c55e;}
+.sets-badge.visible{display:block;}
+.reps-chip{font-family:'Share Tech Mono',monospace;font-size:0.68rem;padding:3px 9px;border:1px solid #22c55e;background:rgba(34,197,94,0.08);color:#22c55e;}
+</style>
 </head>
 <body>
-    <h1>🚒 BIG WHEEL 🚒</h1>
-    <p class="subtitle">WORK OF SEARCH EDITION</p>
-   
-    <canvas id="wheel" width="620" height="620"></canvas>
-   
-    <div>
-        <button id="spinBtn">SPIN IT!</button><br>
-        <button onclick="showAddDrill()">+ ADD DRILL</button>
-        <button onclick="resetToDefaults()">RESET DEFAULTS</button>
-        <button onclick="toggleHistory()">HISTORY</button>
+<div class="header">
+  <h1>🚒 FIRE DRILL WHEEL</h1>
+  <div class="subtitle">V3 · MULTI-SOURCE EDITION · 130+ DRILLS</div>
+  <div class="source-badges">
+    <span class="badge nfpa">NFPA 1001 JPRs</span>
+    <span class="badge ifsta">IFSTA Essentials</span>
+    <span class="badge wos">Work of Search</span>
+    <span class="badge fsri">UL FSRI Research</span>
+    <span class="badge fe">Fire Engineering</span>
+  </div>
+  <div class="stats-bar">LIBRARY:<span id="drillTotal">0</span>&nbsp;|&nbsp;ACTIVE:<span id="activeCount">0</span>&nbsp;|&nbsp;SPINS:<span id="spinCount">0</span>&nbsp;|&nbsp;LAST:<span id="lastDrill">—</span></div>
+</div>
+<div class="main-layout">
+  <div class="mode-toggle-row">
+    <button class="mode-toggle" id="modeToggle" onclick="toggleMode()">⚡ SETS &amp; REPS MODE</button>
+  </div>
+  <div class="sets-badge" id="setsBadge">▶ FOUNDATIONAL DRILLS · GET YOUR REPS IN</div>
+  <div class="filter-section" id="filterSection">
+    <div class="filter-label">▶ FILTER BY CATEGORY</div>
+    <div class="filter-row" id="catFilters"></div>
+    <div class="filter-label" style="margin-top:8px;">▶ FILTER BY DIFFICULTY</div>
+    <div class="diff-row">
+      <button class="diff-btn on-easy" data-diff="Easy" onclick="toggleDiff('Easy')">⬤ EASY</button>
+      <button class="diff-btn on-medium" data-diff="Medium" onclick="toggleDiff('Medium')">⬤ MEDIUM</button>
+      <button class="diff-btn on-hard" data-diff="Hard" onclick="toggleDiff('Hard')">⬤ HARD</button>
     </div>
-
-    <div id="resultModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">×</span>
-            <div id="resultContent"></div>
-        </div>
+  </div>
+  <div class="drill-count">On wheel: <span id="activeCountSmall">0</span> drills</div>
+  <div class="wheel-section">
+    <div class="wheel-frame">
+      <div class="wheel-glow"></div>
+      <div class="pointer-wrap"><div class="pointer"></div></div>
+      <canvas id="wheel" width="560" height="560"></canvas>
+      <div class="center-hub" id="hubBtn">🔥</div>
     </div>
-
-    <div id="historyModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeHistory()">×</span>
-            <h2>HISTORY</h2>
-            <div id="historyList" style="text-align:left; font-size:0.9rem; max-height:60vh; overflow-y:auto;"></div>
-        </div>
+    <div class="btn-row"><button class="btn btn-spin" id="spinBtn">◀ SPIN IT ▶</button></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="openAdd()">+ ADD DRILL</button>
+      <button class="btn btn-secondary" onclick="openHistory()">HISTORY</button>
+      <button class="btn btn-secondary" onclick="openManage()">MANAGE</button>
+      <button class="btn btn-danger" onclick="resetDefaults()">RESET</button>
     </div>
+    <p class="lucky-tip">SPACEBAR · CLICK WHEEL · TAP HUB to spin</p>
+  </div>
+</div>
+<div class="overlay" id="resultOverlay">
+  <div class="modal">
+    <button class="close-btn" onclick="closeResult()">✕</button>
+    <div class="modal-header">
+      <div class="modal-badge" id="res-badge">CAT</div>
+      <div class="modal-title" id="res-title">DRILL</div>
+      <div class="modal-meta" id="res-meta"></div>
+    </div>
+    <div class="modal-body" id="res-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeResult()">CLOSE</button>
+      <button class="btn btn-spin" style="font-size:0.9rem;padding:8px 20px;" onclick="closeResult();setTimeout(spinWheel,100)">SPIN AGAIN</button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="historyOverlay">
+  <div class="modal" style="max-width:480px;">
+    <button class="close-btn" onclick="document.getElementById('historyOverlay').classList.remove('open')">✕</button>
+    <div class="modal-header"><div class="modal-badge">SESSION LOG</div><div class="modal-title">DRILL HISTORY</div></div>
+    <div class="modal-body" id="historyBody" style="min-height:80px;"></div>
+  </div>
+</div>
+<div class="overlay" id="addOverlay">
+  <div class="modal" style="max-width:500px;">
+    <button class="close-btn" onclick="document.getElementById('addOverlay').classList.remove('open')">✕</button>
+    <div class="modal-header"><div class="modal-badge">CUSTOM</div><div class="modal-title">ADD NEW DRILL</div></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Drill Name *</label><input id="f-name" type="text"></div>
+      <div class="form-group"><label>Category</label>
+        <select id="f-cat"><option>Search</option><option>Victim Removal</option><option>Hose Operations</option><option>Water Supply</option><option>Ladders</option><option>SCBA</option><option>Survival</option><option>Forcible Entry</option><option>Ventilation</option><option>Rescue &amp; RIT</option><option>High-Rise</option><option>Tactics</option><option>Engine Company</option><option>Truck Company</option><option>Apparatus</option><option>Skills</option><option>Special Ops</option><option>EMS</option><option>General</option></select>
+      </div>
+      <div class="form-group"><label>Purpose / Description *</label><textarea id="f-desc"></textarea></div>
+      <div class="form-group"><label>Equipment Needed</label><input id="f-equip" type="text"></div>
+      <div class="form-group"><label>Time Estimate</label><input id="f-time" type="text" placeholder="15 min"></div>
+      <div class="form-group"><label>Difficulty</label><select id="f-diff"><option>Easy</option><option selected>Medium</option><option>Hard</option></select></div>
+      <div class="form-group"><label>Plan of Execution (one step per line)</label><textarea id="f-exec" style="min-height:80px;"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('addOverlay').classList.remove('open')">CANCEL</button>
+      <button class="btn btn-spin" style="font-size:0.9rem;padding:8px 20px;" onclick="saveDrill()">ADD DRILL</button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="manageOverlay">
+  <div class="modal" style="max-width:600px;">
+    <button class="close-btn" onclick="document.getElementById('manageOverlay').classList.remove('open')">✕</button>
+    <div class="modal-header"><div class="modal-badge">LIBRARY</div><div class="modal-title">MANAGE DRILLS</div></div>
+    <div class="modal-body" id="manageBody" style="max-height:60vh;overflow-y:auto;"></div>
+  </div>
+</div>
+<div class="ticker"><div class="ticker-inner" id="tickerInner"></div></div>
+<script>
+const DEFAULT_DRILLS=[
+// ENGINE COMPANY
+{id:101,name:"ENGINE: FIRST FIVE MINUTES",cat:"Engine Company",diff:"Hard",time:"20-30 min",src:"FE",
+equip:"Engine, Full PPE, SCBA, 1¾ attack line, Hydrant, Radios, TIC — all positions filled",
+desc:"Simulate first-due engine arrival and execute all seat-assignment tasks within 5 minutes. Based on Fire Engineering's Single Engine Residential Fire program and NFPA 1710 task benchmarks. The engine company that has pre-assigned seat duties performs them automatically. The one that hasn't — improvises. That improvisation costs lives.",
+objectives:"Establish seat-assignment literacy for all positions. Build time awareness — every delay compounds. Identify gaps between SOP and actual performance.",
+safety:"Staged drill only — no live fire. Confirm charged line before simulated entry. IC maintains accountability throughout.",
+execution:["OFFICER (front right): On arrival — verbal size-up via radio: building type, fire location, smoke and flame conditions, visible life hazard. Establish or transfer command.",
+"OFFICER: Initiate or delegate 360 walk-around within 90 seconds. Confirm fire location, access and egress, exposures, victims at windows. Report to crew.",
+"OFFICER: Declare strategy (offensive vs defensive). Designate entry point. Order line selection. Communicate to driver and crew.",
+"DRIVER/ENGINEER: Position apparatus for best tactical advantage. Consider forward lay to fire or reverse lay to hydrant based on distance and SOG.",
+"DRIVER: Establish water supply — forward lay from hydrant or spot and request second engine for supply. Engage pump. Charge attack line on officer's order.",
+"DRIVER: Monitor pump panel — set pressures, verify tank level, confirm flow on all lines. This is your job for the first 5 minutes. Own it.",
+"NOZZLE FF: Pull pre-connected attack line immediately on dismount. Mask up en route to door. Flake line — no kinks, no loops.",
+"NOZZLE FF: Stage at entry point. Bleed air. Confirm flow pattern. Wait for officer's entry order. Do NOT advance an uncharged line into the IDLH.",
+"BACKUP FF: Pull second length and flake behind nozzle FF. Take position at door — hold the nozzle FF's egress route open.",
+"FULL CREW: Timer stops at 5:00. Debrief each position: What was done? What was missed? What caused delay?",
+"REPEAT with scenario variations: 2-person crew, hydrant out of service, victim visible at window on arrival — how does each change the decision tree?"]},
+{id:102,name:"NFPA 1410 — ATTACK LINE & BACKUP",cat:"Engine Company",diff:"Medium",time:"20 min",src:"FE",
+equip:"Engine, 1¾ attack line 150ft+, 2½ backup line 150ft+, Hydrant, Nozzles",
+desc:"NFPA 1410 standard engine evolution: place a 1¾ initial attack line and 2½ backup line simultaneously, both flowing minimum 300 GPM combined. The benchmark for engine company readiness.",
+execution:["Forward lay from hydrant or tank water for drill","Nozzle FF advances 1¾ line to fire room — full 150ft deployed","Backup FF deploys 2½ behind attack crew","Driver charges both lines on crew signal","Both lines flowing — record combined GPM if metered","Debrief: deployment time, kinks, communication, pressure"]},
+{id:103,name:"TRANSITIONAL ATTACK — EXTERIOR TO INTERIOR",cat:"Engine Company",diff:"Hard",time:"15 min",src:"FSRI",
+equip:"Charged hoseline with smooth-bore or combination nozzle, Training structure",
+desc:"UL FSRI research-based transitional attack — apply water from exterior through window or door to cool the fire environment before committing interior crews. Reduces thermal threat without opening flow paths prematurely. Research shows this approach improves occupant survivability in fully developed fires.",
+objectives:"Discuss when transitional attack improves survivability per FSRI data. Practice 15-second exterior knockdown. Coordinate timing with search team entry.",
+execution:["Size-up confirms interior not yet tenable for direct entry","Nozzle FF approaches from exterior — stay out of the flow path, avoid standing in doorway","Apply water through window or door opening for 10-15 seconds — smooth bore preferred for reach","Shut down and assess: smoke and fire volume reduced? Entry now viable?","Communicate to search team: Transitional attack complete — making entry","Advance interior on coordinated signal — within 30 seconds of exterior knockdown","Debrief: flow path control, timing coordination, when NOT to use this tactic"]},
+{id:104,name:"WATER SUPPLY — FORWARD LAY",cat:"Water Supply",diff:"Medium",time:"15 min",src:"NFPA",
+equip:"Engine, LDH or 2½ supply line, Hydrant, Hydrant wrench, Gate valve",
+desc:"NFPA 1410 / NFPA 1001 forward lay evolution — engine lays supply from hydrant to fire building. Core water supply operation.",
+execution:["Engine stops at hydrant — FF takes 2 wraps of supply line around hydrant","Engine drives to fire building laying supply line","Driver connects supply to intake — opens gate valve","FF at hydrant: flush, connect, open hydrant on radio signal","Driver confirms pressure and charges attack line","Debrief: kinks, communication, timing"]},
+{id:105,name:"WATER SUPPLY — REVERSE LAY",cat:"Water Supply",diff:"Medium",time:"15 min",src:"NFPA",
+equip:"Engine, LDH, Hydrant, Gated wye or siamese",
+desc:"NFPA 1410 — engine spots at fire building, lays supply line back to hydrant. Second engine or tanker establishes supply.",
+execution:["Engine spots at fire — attack crew deploys immediately","Driver lays LDH back toward hydrant while driving","Second engine connects to hydrant at end of lay","Radio signal: supply established — charge the line","Debrief: distance limits, relay vs reverse lay decision"]},
+{id:106,name:"2½ HANDLINE ADVANCE",cat:"Hose Operations",diff:"Hard",time:"15 min",src:"IFSTA",
+equip:"2½ handline, Smooth-bore nozzle 1⅛ or 1¼ tip, Full PPE, SCBA",
+desc:"IFSTA Essentials — advance and operate a 2½ inch handline. Minimum 2-person operation delivering 250+ GPM. Required for commercial, large residential, or defensive exposure protection.",
+objectives:"Build proficiency with larger line. Discuss when 2½ is required over 1¾.",
+execution:["Pull and flake 2½ line — minimum 150ft","Don PPE and SCBA, advance to position","Charge line — confirm flow before entering IDLH","Operate nozzle: straight stream for reach and penetration","Maintain team integrity — nozzle FF and backup at all times","Advance 50ft with charged line — demonstrate control","Debrief: when to call for 2½ vs stay on 1¾"]},
+{id:107,name:"LDH OPERATIONS",cat:"Water Supply",diff:"Medium",time:"15 min",src:"IFSTA",
+equip:"5 or 4 inch LDH, Couplings, Hydrant, Engine",
+desc:"IFSTA Essentials — large diameter hose handling, deployment, and connection. LDH carries 1000+ GPM and is unforgiving of kinks or improper coupling.",
+execution:["Unload LDH from bed — proper carry technique","Lay LDH from engine to hydrant or reverse","Connect — gaskets seated, hand-tight then tool-tight","Charge and monitor for leaks at couplings","Demonstrate kink identification and correction under pressure","Drain and reload LDH","Debrief: coupling thread ID, gasket maintenance"]},
+{id:108,name:"HOSE LOADS — FLAT, ACCORDION, HORSESHOE",cat:"Hose Operations",diff:"Easy",time:"12 min",src:"NFPA",
+equip:"2½ hose 3 sections, Hose bed or simulator",
+desc:"NFPA 1001 JPR — demonstrate three standard hose bed loads. Each has advantages for different deployment scenarios.",
+execution:["Flat load — even folds, male coupling at bottom for forward lay","Accordion — folds standing upright for walking deployment","Horseshoe — U-shape for reverse lay or extending a line","Quiz: which load for each scenario?","Timed competition — who loads cleanest in 5 minutes?","Debrief: which load does your department use most and why?"]},
+{id:109,name:"NOZZLE OPERATIONS & FLOW PATTERNS",cat:"Hose Operations",diff:"Easy",time:"10 min",src:"IFSTA",
+equip:"Multiple nozzle types: smooth-bore, combination, automatic, Flowing water",
+desc:"IFSTA Essentials nozzle familiarization — operate each type, demonstrate flow patterns, discuss tactical applications.",
+execution:["Smooth-bore: straight stream — maximum reach and penetration","Combination: straight, narrow fog, wide fog — discuss each application","Automatic: adjust pressure, observe flow changes","Measure GPM if flow meter available","Vote: which nozzle for bedroom fire? Exterior exposure? Basement?","Debrief: nozzle reaction force, staffing requirements"]},
+{id:110,name:"HOSE CLEANING & INSPECTION",cat:"Hose Operations",diff:"Easy",time:"10 min",src:"NFPA",
+equip:"Fire hose, Cleaning brush, Water",
+desc:"NFPA 1001 JPR — clean, inspect, and return hose to service. Hose not inspected regularly fails when it matters most.",
+execution:["Lay hose flat or hang on hose tower","Flush — inspect exterior for cuts, abrasions, burns","Inspect couplings: damage, missing gaskets, thread condition","Coupling swivel test — should rotate freely","Tag damaged sections for removal","Dry completely before reloading","Complete inspection log"]},
+// TRUCK COMPANY
+{id:201,name:"TRUCK: FIRST FIVE MINUTES",cat:"Truck Company",diff:"Hard",time:"20-30 min",src:"FE",
+equip:"Ladder apparatus, Full PPE, SCBA, Ground ladders, Halligan, Axe, Hook, TIC, Radios — all positions filled",
+desc:"Simulate first-due truck arrival and execute all seat-assignment tasks within 5 minutes: apparatus placement, forcible entry, primary search, laddering, 360 report. Based on Fire Engineering's seat-assignment framework and LOVERSU priorities. The truck crew that divides into simultaneous tasks in the first 5 minutes changes the outcome of the fire.",
+objectives:"Establish seat-assignment autonomy — every position knows their job without being told. Evaluate timing of parallel vs sequential task execution. Reinforce LOVERSU priority order for first-due operations.",
+safety:"Staged drill. TIC on during simulated interior ops. All crew accounted for before and after each evolution.",
+execution:["OFFICER (front right): Size-up on approach — fire location, building type, floor count, victims at windows. Radio initial report.",
+"OFFICER: On dismount — carry Halligan and mini-sledge to entry door. Begin or assist forcible entry. Entry is the first priority.",
+"OFFICER: Assign search sectors before entry — fire floor and floor above. Coordinate with engine officer.",
+"CHAUFFEUR: Position aerial for best access — consider setback, overhead utilities, rescue angle to upper floors. Do NOT block hydrant or engine position.",
+"CHAUFFEUR: Perform 360 walk-around — report rear conditions via radio: fire extension, victims at windows, access limitations. Carry hook and Halligan minimum.",
+"CHAUFFEUR: If rear is clear — begin ground laddering to upper floor windows. Ladders go up BEFORE they are needed.",
+"JUMPSEAT FF 1 (inside team): Carry tools to entry. After forcible entry: conduct primary search — fire floor, then floor above. Close every door behind you.",
+"JUMPSEAT FF 1: Victim found — VICTIM VICTIM VICTIM. Radio location. Determine removal method. Do not attempt solo removal if unsafe.",
+"JUMPSEAT FF 2 (outside team or VES): With chauffeur — deploy ground ladders to upper floors. Perform VES if victim is visible at window.",
+"JUMPSEAT FF 2: If assigned OV position — work windows on fire floor from exterior, coordinated with interior. Do not vent ahead of the line.",
+"FULL CREW: Timer stops at 5:00. Debrief: What was accomplished? What was missed? Which position was the bottleneck?",
+"REPEAT with variations: victim showing at 2nd-floor window on arrival, aerial blocked by power lines, 2-person short-staffed truck"]},
+{id:202,name:"LOVERSU — TRUCK PRIORITY DRILL",cat:"Truck Company",diff:"Medium",time:"15 min",src:"FE",
+equip:"Halligan, Axe, Hook, Ground ladders, TIC, Salvage covers",
+desc:"Fire Engineering / John Norman framework — LOVERSU: Ladders, Overhaul, Ventilation, Entry, Rescue & Search, Salvage, Utilities. Drill on timing each function relative to conditions rather than rote order.",
+objectives:"Every member can recite LOVERSU and explain when each occurs. Discuss how victim conditions shift priorities completely.",
+execution:["Classroom: recite and define each LOVERSU function — tools and timing","Which functions are simultaneous on a working fire? Which sequential?","Scenario 1: no victims showing, working fire 2nd floor — build the priority list","Scenario 2: victim at 2nd floor window, heavy smoke — how does the list change?","Scenario 3: fire controlled, building opened up — which functions are now primary?","Tools quiz: for each LOVERSU function, what does your seat carry?","Debrief: where does your department consistently fall short on the list?"]},
+{id:203,name:"VES — VENT ENTER ISOLATE SEARCH",cat:"Truck Company",diff:"Hard",time:"15 min",src:"FE",
+equip:"Ground ladder, Halligan or hook, TIC, Full PPE, SCBA, Window prop or training building",
+desc:"Fire Engineering — Vent Enter Isolate Search. Entry through a window to a specific high-probability room, immediately isolating it by closing the door to protect occupant and firefighter from fire gas migration. VEIS — not VES. The isolation step is non-negotiable.",
+objectives:"Reinforce that VEIS is the standard. Practice door isolation immediately upon entry. Discuss when VEIS is justified vs coordinated search off a hoseline.",
+execution:["Identify target room based on FFRS data and caller information","Ladder at rescue angle to target window","Ventilate window — remove glass, clear sill","Entry — lead foot sweeps floor before committing weight","IMMEDIATELY close door — isolate room from hallway fire gases","Primary search: bed (both sides, under, on top), floor, closet","Victim: VICTIM call — remove via window to ladder","No victim: radio clear, consider next room","Debrief: isolation timing, search completeness, exit decision"]},
+{id:204,name:"AERIAL DEVICE OPERATIONS",cat:"Truck Company",diff:"Hard",time:"20 min",src:"IFSTA",
+equip:"Aerial apparatus, Spotter, PPE",
+desc:"IFSTA aerial apparatus — placement for rescue vs exposure vs elevated stream, stabilizer deployment, tip positioning, load limits.",
+execution:["Spot apparatus — optimal position accounting for utilities, setback, target window","Deploy outriggers on firm surface — full extension and pad contact","Raise aerial to target window or roof position","Position tip at rescue angle — just below windowsill","Simulate victim removal from aerial — package and lower","Reposition for elevated stream: identify flow path and target","Retract and stow — confirm all stabilizers retracted","Debrief: tip load limits, no-fly zones, rescue vs stream positioning"]},
+{id:205,name:"FORCIBLE ENTRY — INWARD & OUTWARD SWING",cat:"Forcible Entry",diff:"Hard",time:"15 min",src:"IFSTA",
+equip:"Halligan, Flathead axe, Inswing door prop, Outswing door prop",
+desc:"IFSTA Essentials — read the door, select the correct technique. Never waste time on the wrong method.",
+execution:["Station 1 — inswing: identify gap, set halligan adze at lock, set with axe, force down","Station 2 — outswing: through-the-lock — remove knob, back-set latch","Station 3 — outswing with exposed hinges: remove hinge pins, pry hinge side","Timed: crew reads 3 different door types and selects technique without coaching","Discuss: padlocks, hasp locks, multi-point locks — what changes?","Debrief: what cues tell you inswing vs outswing at a glance?"]},
+{id:206,name:"ROOF OPERATIONS — VERTICAL VENTILATION",cat:"Ventilation",diff:"Hard",time:"20 min",src:"NFPA",
+equip:"Rotary saw or chainsaw, Roof hook, Roof prop or acquired building, PPE",
+safety:"Never vent on the same side as egress. Sound roof continuously. Abort on soft or charred decking.",
+desc:"NFPA 1001 FF II / IFSTA — vertical ventilation on pitched or flat roof. Safe access, inspection cut, louvered opening, and egress before compromise.",
+execution:["Access roof via aerial or ground ladder — confirm ladder stable","Sound roof with heel and axe butt — feel for soft spots","Straddle ridge or stand on sound section","Inspection cut first: small kerf, check depth, confirm no utilities","Louvered cut: two parallel cuts perpendicular to ridge, connect with cross cuts","Open louver with hook — confirm smoke release","Expand only as much as crews can cover if abandoned","Designate egress BEFORE first cut"]},
+{id:207,name:"SALVAGE OPERATIONS",cat:"Truck Company",diff:"Medium",time:"12 min",src:"IFSTA",
+equip:"Salvage covers, Water vacuum, Squeegee, Mop, Buckets",
+desc:"IFSTA Essentials — salvage cover deployment, catchall construction, water removal. Property conservation is a primary truck function and directly impacts public trust.",
+execution:["One-FF shoulder roll deployment over furniture grouping","Two-FF balloon throw over large area","Catchall construction: fold cover into trough, route water to bucket or drain","Cover electronics, documents, irreplaceable items first","Water removal: squeegee, vacuum, direct drain routing","Debrief: what gets covered first? Most common salvage mistake?"]},
+{id:208,name:"OVERHAUL OPERATIONS",cat:"Truck Company",diff:"Medium",time:"15 min",src:"IFSTA",
+equip:"Hook, Halligan, TIC, CO detector, Full PPE — SCBA mandatory",
+desc:"IFSTA Essentials — systematic fire extinguishment after knockdown. SCBA required — post-fire smoke contains carcinogens.",
+objectives:"Reinforce overhaul begins during fire attack, not after. Discuss carcinogen exposure reduction and gross decon before doffing.",
+execution:["TIC scan — identify hot spots through walls and ceilings","Open walls at hot spots with hook — stay below neutral plane","Apply minimal water directly to hot material","Systematic room-by-room scan — attic and basement last","Check concealed spaces: drop ceilings, wall voids, knee walls","CO detector monitoring throughout","Gross decon before doffing — wipe hood, gloves, coat before removing","Document all opened areas for property owner"]},
+{id:209,name:"UTILITY CONTROL — GAS & ELECTRIC",cat:"Truck Company",diff:"Easy",time:"10 min",src:"NFPA",
+equip:"Gas meter wrench, Electric panel prop",
+desc:"NFPA 1001 JPR — locate and control gas and electrical utilities. Utility control removes energy sources feeding the fire or creating electrocution hazard.",
+execution:["Locate natural gas meter — identify main shutoff (curb stop or meter valve)","Shut off gas: quarter-turn perpendicular to pipe = OFF. Confirm with gas detector","Do NOT restart — gas company's job","Locate electrical panel — identify main breaker","Shut off main breaker — do NOT open panel showing heat or arcing","If external meter: contact utility — never pull meter without authorization","Document utility status for IC and property owner"]},
+// SEARCH
+{id:301,name:"ARM DRAG",cat:"Search",diff:"Medium",time:"10-15 min",src:"WoS",
+equip:"Full PPE, SCBA, Training building or pallet layout, Smoke machine, Victim (live or dummy), Radios, TIC",
+desc:"Work of Search — confidence packaging and evacuating a victim in limited/zero visibility using arm drag. Kimura or Headfirst Arm Lock technique.",
+objectives:"Team communication. Demonstrate arm drag. Remove victim under simulated conditions.",
+safety:"Protect live victims from floor impact. Monitor for exhaustion. Proper body mechanics.",
+execution:["VICTIM VICTIM VICTIM announced on victim identification","Partner radios command: victim found, location, exit, resources needed","Clear entanglements from victim","Sweep under victim for additional victims (children)","Choose arm drag: Kimura or Headfirst Arm Lock","Remove victim completely — radio clear when out","Initiate care immediately"]},
+{id:302,name:"LEG DRAG",cat:"Search",diff:"Medium",time:"10-15 min",src:"WoS",
+equip:"Full PPE, SCBA, Training building, Smoke machine, Victim, Radios",
+desc:"Work of Search — victim evacuation via leg-first drag. Faster initiation than arm drag when victim is face-up.",
+execution:["VICTIM VICTIM VICTIM on identification","Radio command — location, exit, resources","Grab at the ankles — controlled grip","Second FF assists or searches adjacent area","Drag at crawling pace — maintain control of victim's head clearance","Radio clear when victim is outside","Initiate care immediately"]},
+{id:303,name:"LIFE-FIRE-LAYOUT-CALLOUT",cat:"Search",diff:"Medium",time:"12 min",src:"WoS",
+equip:"Full PPE with SCBA, Irons, Door prop, Manikin",
+desc:"Work of Search — 10-second threshold scan at door. Approximately 10% of victims found within 6 feet of an exterior door (FFRS data). Taking time to make time.",
+execution:["Force door or control unlocked door","Get below neutral plane: belly down, hook foot on lock-side jamb","Call FIRE DEPARTMENT — listen 5 seconds for victim response","If visible: scan for victims, fire location, layout, stairs","If smoke-obscured: sweep threshold lock-side to hinge-side","Search behind door for victim or stairs","Locate fire using flashlight to track smoke draw toward ceiling","Relay information to officer before entry","Victim found: VICTIM VICTIM VICTIM — remove immediately"]},
+{id:304,name:"TIC ASSISTED SEARCH",cat:"Search",diff:"Medium",time:"15 min",src:"WoS",
+equip:"Full PPE, SCBA, TIC, Training building, Smoke machine, Victim",
+desc:"Work of Search — TIC as search tool, not crutch. Three-level scanning, limitations (victims under blankets), using TIC to guide searchers.",
+execution:["Entry: determine search method based on TIC availability","Three-level scan at entry: ceiling, eye level, floor","Transition scans at every doorway","Open floor plans: rapid scan, proceed to bedrooms","Oriented search: TIC holder guides second FF","Track smoke draw to locate fire","Radio search complete when all areas covered"]},
+{id:305,name:"ORIENTED SEARCH",cat:"Search",diff:"Hard",time:"20 min",src:"WoS",
+equip:"Full PPE, SCBA, Smoke machine, Training building, Search tool, Radios",
+desc:"Work of Search — anchor FF maintains orientation at door while search FF deploys on tether. Maximizes zero-vis coverage in large spaces.",
+execution:["Anchor FF at door — maintains tether","Search FF enters — full room sweep","Check-ins every 30 seconds via voice or radio","Victim: VICTIM call, anchor guides both to exit","Conditions deteriorate: search FF returns to anchor on tether","Radio progress continuously"]},
+{id:306,name:"TARGETED SEARCH",cat:"Search",diff:"Medium",time:"15 min",src:"WoS",
+equip:"Full PPE, SCBA, Training building, Smoke machine, Victim",
+desc:"Work of Search — bypass low-probability areas to immediately access statistically likely victim locations.",
+execution:["Scenario briefing — caller info, fire location, last known victim location","Identify highest-probability target: bedroom, near exit, first 6ft of exterior door","Enter and move directly to target — acknowledge bypass on radio","Thorough search of target room","Negative: systematically expand outward","Radio each area searched and finding"]},
+{id:307,name:"SPLIT SEARCH",cat:"Search",diff:"Medium",time:"12 min",src:"WoS",
+equip:"Full PPE, SCBA, Training building, Multiple victims, Radios",
+desc:"Work of Search — two-person crew splits to cover two areas simultaneously. Defined reunification point and communication protocol.",
+execution:["Leader designates split point and each FF's search area","Check-ins every 60 seconds","Each FF searches assigned area systematically","Victim found: radio partner immediately","Both return to split point on completion or air alarm","Radio complete or MAYDAY as conditions dictate"]},
+{id:308,name:"SEARCHING WITH A CAN",cat:"Search",diff:"Medium",time:"12 min",src:"WoS",
+equip:"Full PPE, SCBA, Pressurized Water Can with harness, Training building, Rescue dummies",
+desc:"Work of Search — search proficiency while maintaining control of a PWC. Adds fire control to search without hoseline.",
+execution:["At entry: determine search pattern and Can FF role","Advance to highest priority area — maintain PWC control","Search without losing PWC","Scenario fire encountered — Can FF deploys water can rapidly","Victim removal: Can FF may abandon PWC only for victim","Radio progress throughout"]},
+{id:309,name:"WINDOW-INITIATED SEARCH (VEIS)",cat:"Search",diff:"Medium",time:"15 min",src:"WoS",
+equip:"Full PPE, SCBA, Ground ladder, Training building, Victim",
+desc:"Work of Search — enter via window, immediately isolate room, search. VEIS not VES. The isolation step protects both victim and firefighter.",
+execution:["Identify target window — bedroom, high probability based on FFRS data","Ladder at rescue angle or sill-up entry","Clear window, controlled entry — sweep floor before committing","IMMEDIATELY close door — isolate room","Search: beds both sides under and on top, closet, floor","Victim: VICTIM call, remove via window","No victim: radio clear, exit and reassign"]},
+{id:310,name:"FFRS DATA DRILL",cat:"Search",diff:"Easy",time:"10 min",src:"WoS",
+equip:"FFRS data printout (free at firefighterrescuesurvey.com)",
+desc:"Work of Search / Firefighter Rescue Survey — apply survivor location statistics to search priority. Data-driven decisions about where to search first.",
+execution:["Present FFRS data on victim location by room","Identify top 3 probability zones — discuss why","Scenario: given conditions and caller info, where do you search first?","How does FFRS change your pattern vs left-hand wall default?","Apply to your local district — what building stock changes the calculation?","Debrief: one thing FFRS data changed about your approach"]},
+{id:311,name:"BEDS, CRIBS & FURNITURE",cat:"Search",diff:"Medium",time:"15 min",src:"WoS",
+equip:"Full PPE, SCBA, Bedroom furniture mock-up, Victims placed by instructor",
+desc:"Work of Search — systematic furniture search. Victims concentrated in beds, under beds, and cribs.",
+execution:["Enter room, isolate door","Path along walls, break to furniture","Sweep under bed with full arm reach — both sides, full length","Search on top of mattress — incapacitated victims remain in bed","Check crib: top, under, nested furniture","Check closet: floor first, rack level, shelf","Mark searched room","Radio findings"]},
+{id:312,name:"SEARCHING IN HOARDER CONDITIONS",cat:"Search",diff:"Hard",time:"20 min",src:"WoS",
+equip:"Full PPE, SCBA, Search tools, TIC, Heavily cluttered space, Victim in debris",
+safety:"Establish escape route before deep penetration. Frequent air checks. Tether strongly recommended.",
+desc:"Work of Search — hoarder conditions: extreme fuel load, non-standard floor plan, blocked egress, victim concealment in debris.",
+execution:["Entry brief: heavy fuel, blocked egress, non-standard layout","Deploy with search tool — create path through debris","Constant partner contact — tether in heavy conditions","Frequent air checks — consumption increases in physical work","Hands-on search paramount — TIC limited by debris","Victim may be in debris pile or established pathway","MAYDAY plan before deep penetration","Radio updates more frequent than standard"]},
+{id:313,name:"VICTIM ON THE NOZZLE",cat:"Search",diff:"Hard",time:"15 min",src:"WoS",
+equip:"Full PPE, SCBA, Charged hoseline, Victim",
+desc:"Work of Search — victim removal while operating on a hoseline. Short-staffed reality: search and suppression cannot always be separated.",
+execution:["Advance hoseline to search area","Encounter victim during advance","VICTIM VICTIM VICTIM — radio command","Transition nozzle: hand off or wedge in safe position","Package and remove victim","Radio when victim is clear","Reassign to nozzle ops — do not abandon line"]},
+{id:314,name:"SEARCH SIZE-UP",cat:"Search",diff:"Medium",time:"10 min",src:"WoS",
+desc:"Work of Search — exterior search size-up before committing interior resources. Life safety intelligence from the exterior changes the search plan.",
+equip:"No equipment required",
+execution:["360 walk: note windows, doors, fire location, smoke conditions","Identify likely victim locations from exterior","Note access limitations — bars, security doors, gates","Check victim indicators: vehicles, toys, caller-confirmed occupancy","Integrate caller info with visual size-up","Report to command: layout, victim probability, recommended assignment","Debrief: what changed your plan from approach to 360 complete?"]},
+{id:315,name:"COMMUNICATION WHEN SEARCHING",cat:"Search",diff:"Medium",time:"12 min",src:"WoS",
+equip:"Radios, Full PPE, SCBA",
+desc:"Work of Search — radio discipline during active search. Entry report through victim found callout to MAYDAY. Brief, accurate, timely.",
+execution:["Entry radio report: unit, location, action, interior conditions","Interior check-ins every 2 minutes: position and status","Victim found: VICTIM VICTIM VICTIM — location, condition, resources needed","MAYDAY scenario: three times, LUNAR report, activate PASS","Command acknowledgment simulation","Debrief: clarity, LUNAR completeness, wasted radio time"]},
+// SCBA & SURVIVAL
+{id:401,name:"SCBA DONNING — TIMED",cat:"SCBA",diff:"Easy",time:"8 min",src:"NFPA",
+equip:"SCBA, Full PPE, Timer",
+desc:"NFPA 1001 JPR — don full PPE and SCBA under 60 seconds. NFPA 1500 standard. Muscle memory only comes from repetition.",
+execution:["PPE staged — pants and boots on, coat open, SCBA on apparatus","Timer starts on signal","Don coat, hood, helmet, gloves","Don SCBA via over-the-head, coat, or seat-mount method","Don facepiece — seal check by blocking inlet and inhaling","Connect regulator — confirm positive pressure","Activate PASS device","Timer stops when complete, no skin exposed","Record time — repeat until under 60 seconds"]},
+{id:402,name:"SCBA INSPECTION & CYLINDER CHANGE",cat:"SCBA",diff:"Easy",time:"10 min",src:"NFPA",
+equip:"SCBA unit, Spare cylinder, Manufacturer checklist",
+desc:"NFPA 1001 JPR — pre-use operational check including cylinder removal and replacement. An undetected SCBA problem is fatal.",
+execution:["Check cylinder pressure — confirm at rated capacity","Activate unit — check low-pressure alarm at correct threshold","Pressure check via regulator test","Facepiece seal check — covers and gaskets intact","PASS device test — all tones function","Emergency bypass check","Remove cylinder — demonstrate correct technique","Install spare — confirm locking engagement","Return to ready state — document discrepancies"]},
+{id:403,name:"AIR MANAGEMENT DRILL",cat:"SCBA",diff:"Medium",time:"18 min",src:"NFPA",
+equip:"SCBA, Staircase or step bench, Timer",
+desc:"IFSTA / NFPA 1001 — work under physical load while monitoring air supply. The low-air alarm is NOT the turnaround signal — it is the emergency.",
+objectives:"Every FF should know their personal air consumption rate. Turnaround point discipline: turn at 50%, not at the alarm.",
+execution:["Don SCBA — record starting pressure","Timed physical work: stair climb, hose drag, or combination","Monitor pressure every 3-5 minutes — call out readings to partner","Turn around at department turnaround pressure — typically 1500 psi on 3000 psi cylinder","Exit before low-air alarm activates","Record air used — calculate personal consumption rate in psi per minute","Debrief: who went past turnaround? Who waited for the alarm?"]},
+{id:404,name:"SCBA CONFIDENCE MAZE",cat:"SCBA",diff:"Hard",time:"20 min",src:"NFPA",
+equip:"SCBA, Blackout obstacle course, Timer",
+desc:"NFPA 1001 — navigate a blackout course in full SCBA. Composure under stress and zero-vis navigation under real air pressure.",
+execution:["Brief crew on general parameters — no detailed layout","Don full SCBA, confirm seal","Enter maze — navigate by touch","Maintain orientation — count turns, note air movement","Exit within air budget — do not wait for alarm","Disoriented: stop, control breathing, use systematic wall-follow","Debrief: anxiety management, technique, air variance and why"]},
+{id:405,name:"MAYDAY TRANSMISSION — LUNAR",cat:"Survival",diff:"Hard",time:"15 min",src:"NFPA",
+equip:"Radios, Full PPE, SCBA, PASS device",
+desc:"NFPA 1001 — transmit Mayday and complete LUNAR under simulated stress. The most critical survival skill. Must be automatic — LUNAR in under 30 seconds.",
+objectives:"Transmit MAYDAY three times clearly. Complete LUNAR: Location, Unit, Name, Air, Resources. Activate PASS simultaneously.",
+execution:["Scenario: FF disoriented, low air, interior","Transmit MAYDAY MAYDAY MAYDAY on primary channel — clearly, three times","Activate PASS device — do not turn it off","LUNAR: Location (best estimate), Unit, Name, Air remaining, Resources needed","Hold position — conserve air — radio every 30 seconds","Command acknowledges — RIT activates","Debrief: LUNAR completeness, clarity, PASS activation, channel"]},
+{id:406,name:"FIREFIGHTER SELF-SURVIVAL",cat:"Survival",diff:"Hard",time:"15 min",src:"NFPA",
+equip:"Full PPE, SCBA, Training structure",
+desc:"NFPA 1001 / IFSTA — emergency survival when egress is blocked: survive-in-place vs move, reduce profile, signal for rescuers.",
+execution:["Scenario: disoriented, low air, MAYDAY transmitted","Find survival position: low, away from fire, near door or window","Activate PASS — leave it on","MAYDAY continuously with position","Emergency air conservation: slow controlled breathing, minimal movement","Move toward sound, light, or air movement from exterior if possible","Near door: crack and assess heat before exiting","Near window: signal with flashlight or tool — make noise","Hold until RIT contact or egress"]},
+{id:407,name:"ENTANGLEMENT SELF-RESCUE",cat:"Survival",diff:"Hard",time:"15 min",src:"NFPA",
+equip:"Entanglement prop (wire, drop ceiling, debris), Full PPE, SCBA",
+desc:"NFPA 1001 — escape from wire, debris, and drop ceiling entanglement. Panic is the enemy — slow methodical reversal is the solution.",
+execution:["Enter entanglement prop in full gear","Encounter simulated entanglement","Stop — control breathing — assess without fighting","Work backward — retrace path","Do not force forward through the obstacle","Use personal tool to cut if needed","Unable to self-rescue: activate PASS, radio MAYDAY, wait for partner","Debrief: which type was hardest and why?"]},
+{id:408,name:"WINDOW BAIL — EMERGENCY EGRESS",cat:"Survival",diff:"Hard",time:"12 min",src:"NFPA",
+safety:"Begin at ground-level before progressing to height. Spotter required at all times.",
+equip:"Window prop, Ground ladder at low height, Safety mat",
+desc:"NFPA 1001 / IFSTA — emergency exit from window when egress is cut off. Controlled descent technique prevents panic-drop injuries.",
+execution:["Technique: sill-straddle, face interior, lower to arms-extended hang, drop or locate ladder","Ground-level practice first — controlled feet-first, face interior","Intermediate height: locate ladder before committing","Full-height evolution: emergency scenario, controlled exit to ladder","Ladder bail vs drop — when is each appropriate?","Debrief: composure at sill, arm strength, ladder location before commitment"]},
+// LADDERS
+{id:501,name:"GROUND LADDER — 24FT RAISE",cat:"Ladders",diff:"Medium",time:"8 min",src:"NFPA",
+equip:"24ft extension ladder",
+desc:"NFPA 1001 JPR — raise, extend, and heel a 24ft ground ladder to target window. Placing ladders early saves lives — including ours.",
+execution:["One-person: butt, shoulder, hand-over-hand walk-up","Two-person: butt heeled, second raises from mid-point","Extend fly — count clicks to determine extension","Set at rescue angle (70°) — more aggressive than textbook for victim removal","Tip at windowsill — inside tip on outside of sill","Heel by second FF — weight on butt","Confirm stability before climbing","Rescue angle vs fire escape angle — when each is used"]},
+{id:502,name:"GROUND LADDER SELECTION & DEPLOYMENT",cat:"Ladders",diff:"Medium",time:"10 min",src:"IFSTA",
+equip:"Multiple ground ladders 14, 24, 28, 35ft, Target building or prop",
+desc:"IFSTA Essentials — select correct ladder for a given target, carry, and deploy. Knowing ladder reach without measuring is a survival skill.",
+execution:["2nd floor window: which ladder? (24ft for 12-14ft reach)","3rd floor window: which ladder? (35ft)","Roof access: which ladder?","Low vs high shoulder carry — demonstrate each","Fly-in vs fly-out — benefits for different situations","Heeling on hard vs soft surface — technique differences","Alley throw — confined space deployment","Two-ladder rescue: tip placement for victim to choose ladder"]},
+{id:503,name:"ROOF LADDER DEPLOYMENT",cat:"Ladders",diff:"Medium",time:"10 min",src:"IFSTA",
+equip:"Roof ladder, Ground ladder for access",
+desc:"IFSTA Essentials — deploy roof ladder over peak for vertical ventilation or roof operations.",
+execution:["Access roof via ground or aerial ladder","Carry roof ladder hooks-up along slope to peak","At ridge: flip hooks over — confirm both hooks set","Descend on roof ladder rungs","Proper footing: one foot per rung, weight centered","Retreat triggers: smoke from eaves, soft decking, sagging ridge","Practice rapid descent if roof compromised"]},
+{id:504,name:"AERIAL LADDER VICTIM REMOVAL",cat:"Ladders",diff:"Hard",time:"18 min",src:"WoS",
+equip:"Aerial apparatus, Ground ladder backup, Victim, Full PPE, SCBA",
+desc:"Work of Search / IFSTA — victim removal using aerial ladder. Placement, tip positioning, victim packaging, coordinated lowering.",
+execution:["Position aerial — account for victim window and overhead obstructions","Raise aerial — tip just below or at sill","FF climbs aerial to window — packages victim","Victim secured for lowering — controlled assist","Lowering with FF escort — maintain victim orientation","EMS staged at base — transfer of care on ground","Radio all aerial movements to command"]},
+// FORCIBLE ENTRY
+{id:601,name:"CONVENTIONAL FORCIBLE ENTRY",cat:"Forcible Entry",diff:"Hard",time:"15 min",src:"WoS",
+equip:"Halligan, Flathead axe, Door prop",
+desc:"Work of Search / IFSTA — gap-set-force technique. The prerequisite to every interior operation.",
+execution:["Read door: inswing vs outswing, lock position, gap, material","Set halligan adze in gap at lock","Drive with axe — short controlled strikes","Convert to fork for deadbolt if needed","Force with downward and outward leverage","Maintain door control — don't let it slam open","Life-Fire-Layout-Callout immediately at threshold","Radio entry to command"]},
+{id:602,name:"THROUGH-THE-LOCK FORCIBLE ENTRY",cat:"Forcible Entry",diff:"Medium",time:"12 min",src:"IFSTA",
+equip:"K-tool or A-tool, Halligan, Door prop with deadbolt",
+desc:"IFSTA Essentials — remove lock cylinder to defeat deadbolt without destroying door. Preferred when door integrity matters.",
+execution:["Identify key-in-knob or deadbolt lock type","K-tool: drive over lock cylinder, pull — expose keyway","Insert key tool in exposed keyway — manipulate bolt","A-tool: hook over lock, strike to break cylinder","With cylinder removed: use key or pick to open","Door remains intact — important for commercial occupancies","Debrief: when through-the-lock vs conventional?"]},
+{id:603,name:"PADLOCK & CHAIN DEFEAT",cat:"Forcible Entry",diff:"Medium",time:"10 min",src:"IFSTA",
+equip:"Bolt cutters, Halligan, Duck-bill lock breaker, Various padlocks",
+desc:"IFSTA Essentials — defeat padlocks and chains at gate or roll-up door. Covers bolt cutters, lock breaker, and halligan techniques.",
+execution:["Station 1 — open shackle: bolt cutters on shackle, not body","Station 2 — closed shackle: duck-bill lock breaker driven by halligan","Station 3 — chain: cut weakest link, not the padlock","Station 4 — hasp: drive halligan under hasp plate","Timed competition: fastest correct technique wins","Debrief: hardened steel locks — what works and what doesn't?"]},
+// HOSE & WATER
+{id:701,name:"ADVANCING HOSE UP STAIRWAY",cat:"Hose Operations",diff:"Hard",time:"12 min",src:"NFPA",
+equip:"1¾ charged hoseline, Staircase",
+desc:"NFPA 1001 JPR — advance charged hoseline up a stairway. Technique and teamwork prevent kinks that cut flow at the worst moment.",
+execution:["Flake extra hose at base of stairs — 50ft beyond bottom step","Nozzle FF advances: back to wall, hose over shoulder, climb backward","Backup FF manages hose at base — feeds on signal","Charge line at base — confirm flow before stair advance","At top: flake additional length on landing before advancing into hallway","Debrief: kink location, communication, hose management at transitions"]},
+{id:702,name:"ADVANCING HOSE FROM STANDPIPE",cat:"Hose Operations",diff:"Hard",time:"20 min",src:"NFPA",
+equip:"Standpipe pack, 2½ hose with smooth-bore nozzle, PRV removal tool, Pressure gauge",
+desc:"NFPA 1001 FF II — connect and advance from building standpipe. Pressure control is the critical skill.",
+execution:["Connect 2½ to outlet one floor below fire floor","Check outlet pressure — target 100-175 psi residual","PRV capping below 100 psi: remove or adjust","Over 175 psi: add gated wye reducer","Bleed line — confirm flow","Advance to fire floor door","Team: nozzle FF, door FF, backup","Advance on officer order","Debrief: pressure problems and field fixes"]},
+{id:703,name:"HYDRAULIC VENTILATION",cat:"Ventilation",diff:"Medium",time:"12 min",src:"WoS",
+equip:"Charged hoseline with combination nozzle, Training structure",
+desc:"Work of Search — hydraulic ventilation via venturi effect. Useful when fans unavailable or immediate smoke removal needed.",
+execution:["Select exit opening in smoke-filled room","Position nozzle 2-3 feet inside opening — cover 85-90% of opening","Open to wide fog pattern for maximum venturi","Maintain 30-60 seconds — observe smoke direction","Adjust angle for maximum draw","Communicate direction of smoke travel to interior crews","Debrief: hydraulic vent vs PPV — when each is preferred"]},
+{id:704,name:"PPV FAN OPERATIONS",cat:"Ventilation",diff:"Medium",time:"12 min",src:"IFSTA",
+equip:"PPV fan, Training structure",
+desc:"IFSTA Essentials — positive pressure ventilation fan placement, opening selection, coordination with interior operations.",
+execution:["Identify single entry point and single exhaust opening in fire area","Position fan 6-8 feet from entry — cover 85-90% of opening","Confirm exhaust opening is in or adjacent to fire room","Start fan — establish positive pressure before entry (30-45 sec)","Confirm smoke exiting from exhaust only","Communicate to interior: PPV established — make entry","Shut down on IC order — especially during victim removal routes"]},
+{id:801,name:"HYDRANT HOOKUP — TIMED",cat:"Water Supply",diff:"Easy",time:"10 min",src:"NFPA",
+equip:"Hydrant, Hydrant wrench, LDH or 2½ supply line, Gate valve",
+desc:"NFPA 1001 JPR — hydrant hookup including cap removal, flushing, and connection. The driver who can't hook up fast is a liability to every crew inside.",
+execution:["Remove caps — pentagonal wrench, counter-clockwise","Flush hydrant briefly before connection","Connect supply line — LDH or 2½ with reducer","Partially open to supply engine or standby","Communicate water established to driver via radio","Record static and residual pressure","Timed competition — fastest correct hookup wins"]},
+{id:802,name:"PUMP PANEL OPERATIONS",cat:"Water Supply",diff:"Medium",time:"15 min",src:"IFSTA",
+equip:"Engine in place, Attack lines deployed",
+desc:"IFSTA Driver/Operator — pump panel operations under simulated conditions. Establish supply, charge multiple lines, monitor pressures. Advanced: blindfolded panel drill.",
+execution:["Establish water supply at hydrant or tank","Transfer pump into gear — confirm engaged","Charge attack line at correct pressure — typically 100-150 psi at panel for 1¾","Open discharge for backup — maintain pressure on both","Throttle adjustment as lines open and close","Monitor tank level — call for supply before tank empties","Advanced: blindfold driver — find controls by muscle memory alone"]},
+// RESCUE & RIT
+{id:901,name:"RIT ACTIVATION & FF RESCUE",cat:"Rescue & RIT",diff:"Hard",time:"25 min",src:"NFPA",
+equip:"RIT pack with SCBA, Victim in full PPE, Spare cylinder, Radios, TIC, Webbing",
+desc:"NFPA 1001 FF II — Rapid Intervention Team rescue of a downed firefighter. Most complex and physically demanding skill in the fire service.",
+objectives:"Complete sequence: MAYDAY heard, RIT activated, victim located, emergency air, removal. Time to victim is the metric.",
+execution:["MAYDAY received — RIT activated by IC","Enter with TIC and PASS-tracking plan","Locate victim using TIC and PASS signal","Establish contact — announce RIT arrival, assess victim condition","Connect RIT pack — emergency air supply","Radio: victim found, location, condition, removal plan","Clear pathway for removal","Extraction technique: drag, Denver drill, or carry based on condition","Transfer to EMS at exit","Full debrief: time to contact, air provision, removal efficiency"]},
+{id:902,name:"VICTIM DRAG — MULTIPLE TECHNIQUES",cat:"Rescue & RIT",diff:"Medium",time:"12 min",src:"IFSTA",
+equip:"Training dummy, Full PPE, SCBA, Timer, 30ft course",
+desc:"IFSTA Essentials — compare firefighter drag, blanket drag, arm drag, leg drag. Select correct technique for condition and environment.",
+execution:["Firefighter drag: face-up, straddle, arm lock under arms","Blanket drag: roll victim onto cover, pull corners","Arm drag: crossed-arm Kimura grip","Leg drag: grip at ankles — fastest initiation","Time each — same dummy, same course","Victim trauma considerations for each technique","Debrief: 300lb victim? Child? Stairway?"]},
+{id:903,name:"PACKAGING VICTIM FOR STAIR DESCENT",cat:"Rescue & RIT",diff:"Hard",time:"15 min",src:"IFSTA",
+equip:"Training dummy, Staircase 2 flights minimum, Full PPE",
+desc:"IFSTA — package and descend stairs with victim. Head protection and controlled pace are the critical variables.",
+execution:["Package victim — arms crossed, legs controlled","Two-FF: one at shoulders, one at legs","Begin descent — controlled, not sliding","Protect victim's head — shoulder FF controls head position","Too heavy for 2: radio for help, do not rush","Victim's back drags on stairs — acceptable vs dropping them","Debrief: head protection, speed vs control, when to wait for help"]},
+// HIGH-RISE
+{id:1001,name:"HIGH-RISE SEARCH OPERATIONS",cat:"High-Rise",diff:"Hard",time:"20 min",src:"WoS",
+equip:"High-rise pack, SCBA, Full PPE, Radios, TIC, Elevator key",
+desc:"Work of Search — search in large multi-story occupancies. Stairwell travel, floor-by-floor search, standpipe deployment, elevator protocols.",
+execution:["Stage two floors below fire floor — SCBA off until approaching fire floor","Stair climb: conserve air, monitor for smoke in stairwell","Connect standpipe pack on landing outside fire floor","Mask up — enter floor for search","TIC rapid initial scan of large open areas","Communicate search segment to command","Victims removed via stairwell — elevator secondary only if confirmed safe","Radio each floor searched"]},
+{id:1002,name:"STANDPIPE OPERATIONS",cat:"High-Rise",diff:"Hard",time:"20 min",src:"NFPA",
+equip:"Standpipe pack, 2½ hose, Smooth-bore nozzle, PRV removal tool, Pressure gauge",
+desc:"NFPA 1001 FF II — standpipe hookup and advance. Pressure control is the primary challenge. PRVs can cap pressure below fire-fighting threshold.",
+execution:["Connect 2½ to outlet one floor below fire floor","Test outlet pressure — 100-175 psi residual under flow","PRV capping below 100 psi: remove or pin — use caution","Over 175 psi: gated wye reducer","Bleed line — confirm flow and pressure","Advance bundle up stairs to fire floor door","Team entry on officer's order","Advance to fire room","Debrief: how to field-fix PRV problems without specialized tools"]},
+{id:1003,name:"HIGH-RISE PACK CARRY",cat:"High-Rise",diff:"Hard",time:"15 min",src:"FE",
+equip:"Standpipe pack 50-75 lbs, Staircase 4 floors minimum, Timer",
+desc:"Fire Engineering — stair climb in full PPE with standpipe pack. The physical reality of high-rise ops. Departments that skip this drill underestimate the demand.",
+execution:["Full PPE, SCBA on back, standpipe pack on shoulder","Climb 4 floors without stopping — use legs, not railing pull","Timer running — establish department baseline","On arrival: deploy pack and simulate standpipe connection","Descend — monitor heart rate and air consumption","Discuss work-rest cycles for sustained high-rise operations","Debrief: what would change your pace?"]},
+// TACTICS
+{id:1101,name:"THERMAL LAYERING & FLASHOVER RECOGNITION",cat:"Tactics",diff:"Medium",time:"12 min",src:"FSRI",
+equip:"Classroom, TIC optional",
+desc:"UL FSRI research — recognize thermal layering, rollover, and flashover precursors. Reading fire behavior is a survival skill. Modern furnishings reach flashover 8x faster than legacy materials.",
+objectives:"Identify three signs of approaching flashover. Understand neutral plane as life safety indicator.",
+execution:["Review thermal layer diagram: hot gases at ceiling, cool air at floor","Neutral plane: define, find, and why it matters for entry height","Rollover: flameover at ceiling — discontinuous flames chasing gases","Flashover precursors: rapid heat increase, complete ceiling involvement, full smoke throughout","TIC ceiling temperature readings — at what reading is flashover imminent?","Decision drill: given these readings — advance, cool, or retreat?","UL FSRI data: modern furnishings reach flashover 8x faster than legacy"]},
+{id:1102,name:"BASEMENT FIRE TACTICS",cat:"Tactics",diff:"Hard",time:"18 min",src:"FE",
+equip:"Hose, SCBA, Training structure with stairs",
+desc:"Fire Engineering — basement fire tactics. Fire below the attack crew is one of the highest-risk scenarios in structural firefighting.",
+execution:["Scenario: fire in basement, floor above already heated","Identify attack position: avoid directly over fire","Advance to door at top of stairs — do not open without charged line","Open door: control heat release — crack and assess","Angle hose down stairwell: hit ceiling of basement with straight stream","Monitor floor integrity — sound with foot and tool throughout","Coordinate ventilation: opening basement window improves attack but feeds fire","When does the risk exceed the benefit — when do you go defensive?"]},
+{id:1103,name:"FIRE BEHAVIOR — MODERN VS LEGACY FUELS",cat:"Tactics",diff:"Medium",time:"12 min",src:"FSRI",
+equip:"Classroom, FSRI research summary optional",
+desc:"UL FSRI research — modern synthetic furnishings vs legacy natural materials. Time to flashover has decreased dramatically. This changes entry decisions and search time windows.",
+objectives:"Quantify fire growth rate differences. Discuss implications for survivability profiling and search time windows.",
+execution:["FSRI data: modern room fully involved in 3-4 minutes vs legacy 15-20 minutes","Synthetic vs natural fuel heat release rate difference","Implications for search: survivability window is shorter","Implications for attack: early suppression is more critical than ever","Transitional attack as a response to faster fire growth","VEIS timing: the window is narrower in modern construction","How does your department's tactical approach account for this research?"]},
+{id:1104,name:"FLOW PATH CONTROL",cat:"Tactics",diff:"Medium",time:"12 min",src:"FSRI",
+equip:"Training structure or classroom, Door props",
+desc:"UL FSRI research — flow path: movement of air and fire gases through a structure. Controlling flow paths before and during attack is fundamental to modern fireground tactics.",
+objectives:"Define inlet and outlet flow path. Discuss how door control affects victim survivability.",
+execution:["Define flow path: bidirectional in at low out at high, and unidirectional","Door as flow path control — door control saves lives","Scenario: crew forces door and leaves it open — what happens to victim on floor above?","Scenario: door is closed during search — how does this protect the victim?","VES isolation: closing door disconnects room from main flow path","Every door opened or closed is a tactical decision","Name three times you would intentionally control a door on your last working fire"]},
+{id:1105,name:"COORDINATED ENGINE & TRUCK ATTACK",cat:"Tactics",diff:"Hard",time:"25 min",src:"FE",
+equip:"Engine company, Truck company or combined crew, Full PPE, Training structure",
+desc:"Fire Engineering / IFSTA — coordinated operations. Engine protects the search; truck supports the attack. Timing of ventilation with suppression is the critical coordination point.",
+objectives:"Establish communication protocol between companies. Discuss why uncoordinated ventilation is dangerous. Practice one coordinated evolution.",
+execution:["Pre-brief: engine and truck review their first-five-minute tasks independently","Engine: stretch to entry — do not enter until truck reports ready","Truck: force entry, ladder building, report 360 to engine officer","Coordinated entry: engine advances to fire as truck begins search above","Ventilation coordination: truck radios ventilating — engine acknowledges before opening roof","Engine: water on fire — confirm knockdown to truck","Truck: search continues post-knockdown — clear floors","Command tracks both companies continuously","Debrief: what broke down? When did radio discipline fail?"]},
+{id:1106,name:"BUILDING CONSTRUCTION RECOGNITION",cat:"Tactics",diff:"Medium",time:"12 min",src:"IFSTA",
+equip:"Classroom, Building photos, or driving tour",
+desc:"IFSTA Essentials — identify construction type and predict fire behavior. Type I-V classification affects entry decision, tactical approach, and collapse risk.",
+execution:["Type I fire resistive: reinforced concrete — predict fire containment, limited void travel","Type II non-combustible: steel frame — rapid steel failure under heat","Type III ordinary: brick exterior, wood interior — balloon vs platform frame void travel","Type IV heavy timber: mass wood — slow burn, significant collapse when breached","Type V wood frame: most common residential — rapid fire travel, lightweight truss failure","Driving tour: identify each type in your district","Debrief: which construction type in your district presents the most risk and why?"]},
+// APPARATUS & SKILLS
+{id:1201,name:"APPARATUS BLIND COMPARTMENT ID",cat:"Apparatus",diff:"Easy",time:"10 min",src:"FE",
+equip:"Engine or truck",
+desc:"Fire Engineering — blind compartment identification. Know every piece of equipment without opening the door first. No firefighter should be searching at 2am.",
+execution:["Pair up: one FF quizzes, one answers eyes closed or back to apparatus","Quiz: Where is the TIC? Where are the webbing straps? Where is the spare cylinder?","Physical verification: find it in 10 seconds — go","Switch roles","Identify discrepancies from last apparatus check","Log missing or damaged equipment","Debrief: which compartment does your crew know least well?"]},
+{id:1202,name:"KNOT TYING — FIRE SERVICE STANDARDS",cat:"Skills",diff:"Easy",time:"12 min",src:"NFPA",
+equip:"Rope sections per FF, Carabiners, Anchor points",
+desc:"NFPA 1001 JPR — bowline, clove hitch, figure-eight on a bight, half hitch, and becket/sheet bend. Applied to tool hoisting and life safety.",
+execution:["Bowline: non-slipping loop — apply to victim harness","Clove hitch: adjustable attachment — on rung or anchor point","Figure-eight on a bight: strong midpoint loop — for life safety anchor","Half hitch: securing tool or hose — finishing knot","Becket/sheet bend: joining ropes of different diameter","Hoisting: hoist halligan, pike pole, and hose using correct knot","Timed: correct knot in under 30 seconds — gloves on"]},
+{id:1203,name:"ROPE INSPECTION & RETIREMENT CRITERIA",cat:"Skills",diff:"Easy",time:"10 min",src:"NFPA",
+equip:"Fire service rope sections new and retired, Inspection form",
+desc:"NFPA 1001 / NFPA 1858 — inspect rope and determine serviceability. Life safety rope has zero tolerance for defects.",
+execution:["Inspect sheath: cuts, abrasions, burns, discoloration","Inspect core: soft spots or voids — feel every 12 inches","Inspect ends: fraying, melted areas, damaged whipping","Check chemical exposure history — acid exposure = retire immediately","Document on rope log","Retire any rope that fails — permanent marker, remove from service","Utility rope vs life safety rope — never confuse the two"]},
+{id:1204,name:"HAZMAT AWARENESS — DECON SETUP",cat:"Special Ops",diff:"Medium",time:"12 min",src:"NFPA",
+equip:"Decon kit, Garden hoses or decon line, PPE, Zone markers",
+desc:"NFPA 1001 — hazmat awareness level response and emergency gross decon setup. FFs must recognize and isolate hazmat before committing resources.",
+execution:["Recognize indicators: placards, container type, spill, victim symptoms","Establish hot/warm/cold zone boundaries — upwind, uphill, upstream","Gross decon corridor: clothing removal, 15-minute flush, clean side","Victim decon: remove clothing first (80% contamination reduction), then flush","Self-decon for FFs before PPE removal — wipe hood and coat before doffing","Log all personnel through decon","Do NOT enter hot zone without hazmat team","3 ways to identify a hazmat scene from the apparatus before dismounting"]},
+{id:1205,name:"EMS — FIRE VICTIM CARE",cat:"EMS",diff:"Medium",time:"12 min",src:"IFSTA",
+equip:"CPR mannequin, Oxygen delivery, BVM, Burn dressing, C-collar",
+desc:"IFSTA — fire-specific EMS considerations. Smoke inhalation, burn management, and trauma. FFs are often first medically trained person at the patient.",
+execution:["Smoke inhalation: remove from IDLH, 100% O2 via NRB, position of comfort or supine","Carbon monoxide: high-flow O2, monitor LOC — CO binds 240x stronger than O2","Burn victim: stop burning, cool with room-temp water, cover with dry dressing — no butter, no ice","Burns with trauma: C-spine precaution if fall mechanism","BVM: two-person technique, maintain seal","Cardiac arrest from smoke/CO: CPR and AED — survival rates not zero if fast","Top 3 mistakes in fire victim initial care"]},
+{id:1206,name:"CANCER REDUCTION — POST-FIRE DECON",cat:"Skills",diff:"Easy",time:"10 min",src:"FSRI",
+equip:"Wet wipes, Water, PPE all items, Change of clothing",
+desc:"UL FSRI / NFPA 1581 — on-scene gross decon reduces carcinogen exposure from fire suppression. This must be automatic, not optional.",
+objectives:"Gross decon as standard post-fire step. Dermal absorption is a primary carcinogen pathway.",
+execution:["Immediately after exiting IDLH: wipe exposed skin — neck, face, hands, ears","Remove hood and facepiece before removing coat — hood traps contaminants","Wipe down coat and hood before storing — never bring gear into living quarters","Bag contaminated gear separately — decon before rebagging for apparatus","Change clothing as soon as possible — shower within 1 hour of fire","Document exposure in department CAIRS or tracking system","Which steps does your crew currently skip and why?"]},
+// GENERAL
+{id:1301,name:"AFTER ACTION REVIEW",cat:"General",diff:"Easy",time:"15 min",src:"FE",
+equip:"Recent incident report or training scenario documentation",
+desc:"Fire Engineering / Work of Search — structured After Action Review. What was planned? What happened? What do we sustain and what do we improve?",
+execution:["What was the intent of the evolution or incident?","What actually happened — without blame, just facts","What went well — be specific, not generic","What needs improvement — specific and actionable","Who owns each improvement item — name and date","Schedule follow-up drill to close the gap","4 questions, equal time, no rank during review period"]},
+{id:1302,name:"CREW RESOURCE MANAGEMENT",cat:"General",diff:"Medium",time:"15 min",src:"FE",
+equip:"Scenario cards, Radios",
+desc:"Fire Engineering — CRM adapted for fire service. Authority gradients, STOP protocol, creating psychological safety to speak up before someone gets hurt.",
+execution:["Scenario 1: rookie observes officer error — what language do they use?","Scenario 2: crew disagrees with IC order — what are the channels for pushback?","STOP protocol: any member calls halt on safety grounds — practice the language","What happens in your firehouse when a newer FF speaks up?","Build language: I am not comfortable with... I need us to stop because...","Debrief: psychological safety is trained, not assumed"]},
+{id:1303,name:"FIREFIGHTER RESCUE SURVEY DATA REVIEW",cat:"General",diff:"Easy",time:"10 min",src:"WoS",
+equip:"FFRS data printout (free at firefighterrescuesurvey.com)",
+desc:"Work of Search / FFRS — review current data as a crew. Data changes how we search, where we search first, and how we allocate resources.",
+execution:["Present current FFRS data on victim location by room","Identify top 3 probability zones in residential structures","Does this match your department's incident experience?","Apply to your local building stock — what is different about your district?","Where does your crew search first in a typical single-family residence?","How does data change your assignment if you arrive second-due?","One thing this data changes about your next working fire approach"]},
+{id:1304,name:"RAPID EGRESS DRILL",cat:"Survival",diff:"Medium",time:"10 min",src:"NFPA",
+equip:"Full PPE, SCBA, Training structure or maze",
+desc:"NFPA 1001 — rapid egress from deteriorating interior. Follow hoseline, follow air from exterior, wall-follow to door. PASS active the entire time.",
+execution:["Scenario: conditions deteriorate — visibility zero, air alarm sounding","Activate PASS immediately","Radio MAYDAY and best position estimate","Follow hoseline to exit if available","No hose: wall-follow systematically — pick a wall, stay on it","Do not abandon SCBA","Signal from windows or doors: flashlight, tool noise, voice","Debrief: MAYDAY decision time, air remaining, route accuracy"]}
+];
+const SETS_REPS_DRILLS=[
+{id:9001,name:"SCBA DONNING — TIMED REPS",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"NFPA",
+reps:"5 reps per FF · Target: sub-60 sec every rep",
+equip:"SCBA, Full PPE, Timer",
+desc:"The foundational rep. Every FF, every shift, until sub-60 is automatic. NFPA 1500 standard. Track your personal best and beat it.",
+execution:["Full PPE staged: pants/boots on, coat open, SCBA on apparatus or bench","Timer starts on go signal","Don coat — hood — helmet — gloves","Over-the-head or coat method SCBA — any accepted per department","Facepiece on — seal check by blocking inlet and inhaling","Connect regulator — confirm positive pressure — activate PASS","Timer stops: all gear on, no skin exposed, PASS active","Rep 1-5: record each time. Debrief: who improved? Who stalled? Why?","Goal: the alarm sounds and you're masked up before your brain finishes waking up"]},
+{id:9002,name:"24FT LADDER RAISE — REPS",cat:"Fundamentals",diff:"Easy",time:"12 min",src:"NFPA",
+reps:"3 raises per FF · 1-person and 2-person methods",
+equip:"24ft extension ladder, Target wall or building",
+desc:"Throw it until you stop thinking about it. The ladder that doesn't go up in the first 90 seconds doesn't go up when it matters.",
+execution:["Rep 1 — 1-person method: butt, shoulder, walk-up hand-over-hand, set at 70° rescue angle","Rep 2 — 2-person method: one heels, one raises from mid-section, extend, set","Rep 3 — speed rep: from flat on ground to heeled at window, timed","Between reps: check fly-up vs fly-down orientation — discuss which and when","Check tip placement: inside of tip on outside of sill for victim removal","Debrief: which FF is slowest? Why? What's the fix?","Bonus: raise with tools in hand — pike pole or irons — does technique break down?"]},
+{id:9003,name:"MASK UP EN ROUTE — WALK DRILL",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"NFPA",
+reps:"5 reps per FF · Mask up while moving",
+equip:"SCBA, Full PPE, 50ft course or parking lot",
+desc:"You don't mask up at the door — you mask up walking to the door. If you can't do it moving, you're burning time and air at the worst possible moment.",
+execution:["FF starts at one end of course — SCBA on back, mask in hand or stowed","On go: walk briskly toward far end while donning facepiece","Facepiece seated and sealed before reaching the far end (50ft)","Add: gloves on simultaneously — can you do both while moving?","Repeat: jog instead of walk — does technique hold?","Repeat: do it in the dark or with low lighting","Debrief: every second at the door threshold unmasked is smoke inhalation"]},
+{id:9004,name:"HOSE STRETCH — 1¾ PRECONNECT",cat:"Fundamentals",diff:"Medium",time:"12 min",src:"NFPA",
+reps:"3 full stretches per crew · Timed",
+equip:"1¾ preconnected attack line, Engine, Timer",
+desc:"Pull it, flake it, advance it. The crew that can stretch a line in under 60 seconds controls the first five minutes. The crew that can't — chases the fire.",
+execution:["Rep 1: pull preconnect — flake line full length — nozzle FF to simulated door — timer stops when in position with line charged","Rep 2: add obstacle — parked car, fence corner — can you still flake without kinks?","Rep 3: 2-person crew only (short-staffed simulation) — how does the stretch change?","Standard: 150ft of 1¾ deployed, no kinks, nozzle FF at door in under 90 sec with 2-person crew","Check: is the line flaked so it feeds forward? Or will it collapse and kink when charged?","Debrief: where did the kink happen? Same spot every time? Fix it."]},
+{id:9005,name:"VES — WINDOW ENTRY REPS",cat:"Fundamentals",diff:"Medium",time:"15 min",src:"FE",
+reps:"3 entries per FF · Emphasize isolation step every time",
+equip:"Ground ladder, Window prop or low training building, Door to close",
+desc:"Vent Enter Isolate Search — not VES. The isolation step is the rep that gets skipped in training and costs lives on the fireground. Drill it until it's a reflex.",
+execution:["Rep 1: ladder to window at rescue angle — ventilate — controlled entry — sweep floor — CLOSE DOOR — search room","Rep 2: same but timed — window entry to door isolated in under 20 seconds","Rep 3: victim in room — entry, isolate, find, radio VICTIM VICTIM VICTIM","The close-door step is mandatory on every rep — if it gets skipped, restart","Debrief after every rep: was the door closed before the search started? Yes or no.","Discuss: what happens if the door is NOT closed and fire is in the hallway?","Build the habit: ladder angle — ventilate — lead foot sweeps — CLOSE DOOR — search"]},
+{id:9006,name:"MAYDAY — LUNAR REPS",cat:"Fundamentals",diff:"Hard",time:"12 min",src:"NFPA",
+reps:"5 transmissions per FF · Timed under 30 sec each",
+equip:"Radios, PASS device",
+desc:"MAYDAY is a perishable skill. If you haven't said it out loud this month, you will hesitate when it counts. Repetition removes hesitation.",
+execution:["Scenario: FF is disoriented, low air, conditions deteriorating","Rep 1: transmit MAYDAY MAYDAY MAYDAY — activate PASS — complete LUNAR","LUNAR: Location (floor and room estimate), Unit (apparatus number), Name, Air (psi remaining), Resources needed","Timer: LUNAR complete in under 30 seconds — timed every rep","Rep 2: different scenario — different location, different air reading","Rep 3-5: rotate scenarios — each FF transmits at least 5 times this session","Debrief: who hesitated? Who skipped a LUNAR element? Who didn't activate PASS?","Goal: LUNAR should come out as one rehearsed sentence, not assembled under panic"]},
+{id:9007,name:"FORCIBLE ENTRY — DOOR READING REPS",cat:"Fundamentals",diff:"Medium",time:"12 min",src:"WoS",
+reps:"5 doors per FF · Read and force without coaching",
+equip:"Halligan, Flathead axe, Inswing and outswing door props (mix)",
+desc:"Read the door and pick the technique before the tool touches the frame. The FF who has to think about inswing vs outswing costs the crew 60 seconds at the worst possible moment.",
+execution:["Set up 3-5 different doors: inswing, outswing, inswing with deadbolt, outswing with hasp","FF approaches — reads door — calls out technique before touching it","Force the door using the called technique — officer grades: correct? Efficient?","Rep count: 5 doors per FF without coaching on technique selection","Track time from approach to door open: target under 60 seconds per door","Add: do it in partial or no lighting","Debrief: which door type causes the most hesitation? That's the one to rep more."]},
+{id:9008,name:"RIT PACK DEPLOYMENT REPS",cat:"Fundamentals",diff:"Hard",time:"15 min",src:"NFPA",
+reps:"3 full deployments per crew · Emergency air connection each time",
+equip:"RIT pack with spare SCBA cylinder, Training dummy in full PPE, Timer",
+desc:"The RIT pack has to come off the apparatus and onto a downed FF without fumbling. If you can't locate and connect it in the dark under stress, it's not ready and neither are you.",
+execution:["Rep 1: locate RIT pack on apparatus — remove and carry to simulated downed FF — connect emergency air supply — timer running","Rep 2: same but downed FF is in a confined space or around a corner","Rep 3: downed FF is entangled — remove entanglement, then connect air","Standard: RIT pack located, removed, and emergency air connected in under 2 minutes","All crew rotates — every FF handles the pack, not just the officer","Verify after every rep: is the air actually flowing? Did the connection fully seat?","Debrief: which step added the most time? Is the pack stored where everyone knows it is?"]},
+{id:9009,name:"ARM DRAG — VICTIM REMOVAL REPS",cat:"Fundamentals",diff:"Medium",time:"12 min",src:"WoS",
+reps:"5 drags per FF · 30ft course, full PPE",
+equip:"Training dummy (minimum 150 lbs), Full PPE, SCBA, 30ft course, Timer",
+desc:"Work of Search — the arm drag is the most used victim removal technique. It has to be strong, fast, and maintainable over distance when you're already at the end of your air.",
+execution:["Rep 1: Kimura grip — drag dummy 30ft — note time","Rep 2: Headfirst arm lock — drag 30ft — compare time and control","Rep 3: drag through a door threshold — technique must not break at the obstacle","Rep 4: drag with SCBA on and low-air alarm sounding — composure under pressure","Rep 5: team drag — two FFs, 30ft, coordinated movement","Standard: 150lb dummy, 30ft, under 45 seconds — adjust target for your local dummy weight","Debrief: which grip was stronger? Where did technique break down under fatigue?"]},
+{id:9010,name:"KNOT TYING — GLOVES ON REPS",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"NFPA",
+reps:"5 reps per knot per FF · Gloves on every rep",
+equip:"Rope sections per FF, Anchor points or rungs",
+desc:"NFPA 1001 requires it. The field requires it with gloves on, in the dark, at 3am. If you can't tie a bowline in gloves, you can't tie a bowline.",
+execution:["Bowline x5: non-slipping loop — used for victim harness and anchor — gloves on every rep","Clove hitch x5: adjustable attachment to rung or post — gloves on","Figure-eight on a bight x5: life safety loop — timed under 20 seconds","Half hitch x5: finishing knot to secure tool or hose","Bonus round: call out a knot — FF ties it from memory, no demonstration first","Add: tie in reduced lighting or behind your back (simulates tight space)","Debrief: which knot is weakest in the group? Run more reps on that one."]},
+{id:9011,name:"GROUND LADDER SELECTION DRILL",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"IFSTA",
+reps:"5 scenarios per crew · Call the ladder before you pull it",
+equip:"Apparatus with multiple ground ladders (14, 24, 28, 35ft), Target building",
+desc:"Know your ladder reaches without math. When a victim is at a second-floor window, you should be walking to the 24 before the words are finished.",
+execution:["Officer calls: victim at 2nd floor window — which ladder? (24ft)","Officer calls: access to pitched roof — which ladder? (28 or 35ft)","Officer calls: flat roof, one story — which ladder? (14ft)","Officer calls: 3rd floor window — which ladder? (35ft)","Officer calls: confined alley, 2nd floor — which ladder and technique? (24ft, alley throw)","Each FF calls the ladder and retrieves it — no coaching, no corrections during the drill","Debrief: slow responses reveal the gaps — which scenario caused hesitation?"]},
+{id:9012,name:"PPE INSPECTION — FIND THE DEFECT",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"NFPA",
+reps:"Full inspection every shift · Timed under 5 min",
+equip:"Full structural PPE set including SCBA",
+desc:"Pre-shift PPE inspection is a rep. The FF who skips it finds the blown seam or cracked facepiece lens at the worst possible time.",
+execution:["Coat: inspect seams, thermal liner attachment, closure integrity, collar, wristlets","Pants: inspect seams, suspenders, knee reinforcement, closure","Boots: inspect soles, steel toe integrity, pull straps","Hood: inspect for holes, thinning fabric, burn damage","Helmet: inspect shell for cracks, face shield, earflaps, chinstrap","SCBA facepiece: inspect seal, lens, harness straps, exhalation valve","SCBA cylinder: confirm full, check low-pressure alarm function","Flag any defect immediately — do not mask it, do not use compromised gear","Record inspection completion — accountability matters"]},
+{id:9013,name:"CHARGED LINE ADVANCE — STAIRS",cat:"Fundamentals",diff:"Hard",time:"12 min",src:"NFPA",
+reps:"3 advances per crew · Full staircase",
+equip:"1¾ charged hoseline, Staircase",
+desc:"Advancing a charged line up stairs is physically demanding and technique-dependent. The kink at the bottom of the stairs that cuts your flow — that gets fixed in training, not on the fireground.",
+execution:["Rep 1: nozzle FF advances backward up stairs — hose over shoulder, back to wall — backup FF manages at base — charged line","Rep 2: advance with line kinking intentionally — crew must identify and clear the kink while moving","Rep 3: advance with simulated low-light — flashlight only or no lights","Standard: 150ft of 1¾ to top of 2-story staircase, no kinks, under 90 seconds","Check: hose flaked at base before starting? Or is the crew fighting the line the whole way?","Debrief: kink location — same spot every time? That's a training problem, not bad luck."]},
+{id:9014,name:"SCBA EMERGENCY BYPASS — REPS",cat:"Fundamentals",diff:"Hard",time:"10 min",src:"NFPA",
+reps:"5 reps per FF · Locate and activate without looking",
+equip:"SCBA per FF",
+desc:"The bypass is there for regulator failure. If you've never practiced activating it under stress with gloves on, you won't find it when the regulator fails at 600 psi.",
+execution:["Rep 1: locate bypass valve with gloves on — activate it while wearing SCBA","Rep 2: same but eyes closed — find it by touch only","Rep 3: while moving — crawling on hands and knees, activate bypass","Rep 4: partner calls 'regulator failure' — FF activates bypass from muscle memory","Rep 5: activate, breathe from bypass, then reset — full sequence","Every FF on every SCBA model used by your department","Debrief: how many FFs knew where the bypass was before today's drill?"]},
+{id:9015,name:"SEARCH PATTERN — ROOM REPS",cat:"Fundamentals",diff:"Medium",time:"12 min",src:"WoS",
+reps:"5 rooms per FF · Zero visibility",
+equip:"Full PPE, SCBA, Darkened training room or blackout room, Victim placed by instructor",
+desc:"Work of Search — systematic room search in zero visibility. The FF who searches the same room the same way every time will find victims. The FF who improvises will miss them.",
+execution:["Rep 1: standard room search — wall contact, sweep furniture systematically, check all beds and under beds","Rep 2: victim placed under bed — find it","Rep 3: victim behind door — find it","Rep 4: room with multiple obstacles (chairs, toys) — complete search without skipping","Rep 5: two-FF team — split and complete room in half the time","Standard: room completely searched with victim found (or clear) in under 90 seconds","Debrief: which hiding spot was missed most often? That's the gap."]},
+{id:9016,name:"VICTIM CALLOUT — RADIO REPS",cat:"Fundamentals",diff:"Medium",time:"10 min",src:"WoS",
+reps:"5 transmissions per FF · Complete callout in under 15 seconds",
+equip:"Radios, Full PPE",
+desc:"Work of Search — VICTIM VICTIM VICTIM transmission. You have one job at that moment: get accurate information to command fast. Rep it until it's automatic.",
+execution:["Scenario given: victim found, 2nd floor front bedroom, unresponsive, need RIT and EMS","Rep 1: FF transmits complete victim callout — VICTIM x3, location, condition, resources needed","Time it: full callout in under 15 seconds","Rep 2: different scenario — different floor, different condition","Rep 3: add: victim found while air alarm is sounding — composure under pressure","Reps 4-5: rotate FFs — every member transmits at least 5 callouts this session","Debrief: who said unnecessary words? Who skipped location? Who froze?"]},
+{id:9017,name:"HYDRANT HOOKUP — TIMED REPS",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"NFPA",
+reps:"3 hookups per driver · Target under 60 seconds",
+equip:"Hydrant, Supply line, Hydrant wrench",
+desc:"The driver who can hook up a hydrant in under 60 seconds every time is an asset. The driver who struggles with it every time is a liability to the crew inside.",
+execution:["Rep 1: full hookup — cap off, flush, connect, partially open — timed","Rep 2: same but hydrant is buried in grass or behind obstacle — find the cap, complete hookup","Rep 3: different hydrant — different thread or outlet size — adapt","Standard: caps off, flushed, connected, flowing to engine in under 60 seconds","All FFs should be able to perform this — not just the driver","Debrief: record each driver's time — accountability drives improvement"]},
+{id:9018,name:"360 SIZE-UP — REPORT REPS",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"FE",
+reps:"5 scenarios per crew · Report complete in under 60 seconds",
+equip:"Training building, Photos of structures (alternate), Radios",
+desc:"Fire Engineering — the 360 is a habit, not a checklist. The officer who completes and reports a 360 in under 60 seconds changes the outcome of the incident.",
+execution:["Rep 1: walk the building (or photo scenario), complete 360, transmit report to command","Report format: building type, floors, fire location and extension, access/egress, victims visible, recommended entry point","Time it: 360 complete and reported in under 60 seconds","Rep 2: add complication — victim at rear window, fire extension to exposure","Rep 3: night scenario or limited visibility — what changes?","Rep 4-5: rotate officers — every company officer transmits at least 5 reports","Debrief: who missed the exposure? Who didn't note the victim? Fix it now."]},
+{id:9019,name:"PASS DEVICE — ACTIVATION REPS",cat:"Fundamentals",diff:"Easy",time:"8 min",src:"NFPA",
+reps:"5 activations per FF · Manual activation emphasis",
+equip:"PASS device or integrated SCBA PASS",
+desc:"Manual PASS activation during a MAYDAY is non-negotiable. It supplements the auto-activation and tells rescuers you know you're in trouble. Rep it until it's muscle memory.",
+execution:["Rep 1: locate PASS device on SCBA — manually activate — confirm all tones sound","Rep 2: activate with gloves on — confirm same result","Rep 3: activate while prone on floor — position should not prevent activation","Rep 4: activate, then reset — practice the full sequence","Rep 5: eyes closed — activate from memory alone","Every FF on every SCBA in your department's fleet","Debrief: how many FFs have activated their PASS manually in the last 30 days? In the last year?"]},
+{id:9020,name:"HOOK & TOOL CARRY — MOVING REPS",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"FE",
+reps:"5 evolutions per FF · Tools appropriate to seat assignment",
+equip:"Halligan, Flathead axe, Hook, TIC, RIT pack (per seat assignment)",
+desc:"Fire Engineering — know your seat tools, carry them correctly, and arrive at your assignment with both hands free when possible. Tool management is a fundamental skill.",
+execution:["Each FF identifies their seat-assignment tools — no coaching","Rep 1: remove tools from apparatus — carry to simulated entry point — no dragging, no dropping","Rep 2: carry tools up one flight of stairs — maintain control throughout","Rep 3: carry tools through a doorway while managing the door — real skill","Rep 4: hand off tools to partner — clear communication","Rep 5: replace tools to correct compartment from memory — no looking","Debrief: who didn't know which tools belonged to their seat? That's the gap."]},
+{id:9021,name:"ACCOUNTABILITY — PAR DRILL",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"NFPA",
+reps:"3 PAR counts per crew · Complete under 60 seconds",
+equip:"Radios, Accountability tags or PASSPORT system",
+desc:"NFPA 1500 — PAR (Personnel Accountability Report) is a survival tool. If IC can't get a PAR in 60 seconds, someone is already in trouble and nobody knows it.",
+execution:["Rep 1: IC calls PAR — every unit reports in sequence — IC records all units accounted for or not","Rep 2: one unit doesn't respond — IC initiates search protocol — what are the steps?","Rep 3: PAR during simulated fireground chaos — radios busy, other traffic — maintain discipline","Standard: full company PAR complete in under 60 seconds","Rotate IC role — every officer should run PAR, not just the chief","Debrief: who hesitated? Who used wrong radio format? Who's not sure what PAR means?"]},
+{id:9022,name:"THERMAL IMAGING — SCANNING REPS",cat:"Fundamentals",diff:"Medium",time:"10 min",src:"FSRI",
+reps:"3 scans per FF · Three-level scan every time",
+equip:"TIC (thermal imaging camera), Training building or room",
+desc:"UL FSRI — the TIC is a tool, not a crutch. Proper scanning at three levels extracts maximum information. The FF who stares at one level misses victims and misreads conditions.",
+execution:["Rep 1: enter room — three-level scan: ceiling (fire gases and heat), eye level (victims standing or seated), floor (victims down, children, pets)","Rep 2: identify simulated hot spot in wall — locate source, not just the hot spot","Rep 3: scan through smoke — differentiate between ceiling heat, warm object, and body heat","Standard: complete three-level scan in under 15 seconds per room","Practice: using TIC to guide a second FF — verbal direction only","Debrief: who defaulted to eye-level scanning only? Three levels is the standard."]},
+{id:9023,name:"DOOR CONTROL — REPS",cat:"Fundamentals",diff:"Medium",time:"10 min",src:"FSRI",
+reps:"5 reps per FF · Identify and control every door",
+equip:"Door props or actual building, Full PPE",
+desc:"UL FSRI / Work of Search — every door opened or closed on the fireground is a tactical decision that affects flow path, victim survivability, and firefighter safety.",
+execution:["Rep 1: enter building — close every door behind you on the way to the fire room — count how many doors you controlled","Rep 2: search scenario — close the door on entry to each room — search — mark searched","Rep 3: advancing hoseline — nozzle FF manages door while backup flakes hose — coordinated","Rep 4: locate fire room — crack door — assess — communicate findings — control door during entry","Rep 5: exit — close doors behind you — why does this matter post-fire?","Debrief: which rep revealed a door-control gap? Every door is a decision."]},
+{id:9024,name:"AIR CONSUMPTION — PERSONAL RATE DRILL",cat:"Fundamentals",diff:"Medium",time:"20 min",src:"NFPA",
+reps:"1 timed evolution per FF · Record psi per minute",
+equip:"SCBA, Physical activity prop (stairs or hose drag), Timer",
+desc:"Every FF should know their personal air consumption rate. If you don't know your rate, you don't know your turnaround point. You're guessing your survival window.",
+execution:["FF dons SCBA — record starting pressure","Begin physical work: stair climb or hose drag — maintain consistent effort","Every 2 minutes: call out current pressure to partner","Work for 10 minutes — record pressure at each interval","Calculate rate: (starting pressure - ending pressure) / 10 minutes = psi per minute","Determine personal turnaround pressure: if rate is 30 psi/min, you need 150 psi to exit — know your number","Compare rates across crew — who consumes fastest? They get out first.","Debrief: does your department's turnaround SOP match your personal consumption rate?"]},
+{id:9025,name:"HOSE LOAD — RELOAD REPS",cat:"Fundamentals",diff:"Medium",time:"12 min",src:"NFPA",
+reps:"3 full loads per crew · Timed",
+equip:"2½ hose (3 sections), Hose bed or simulator",
+desc:"NFPA 1001 — loading hose correctly is a rep, not a skill you perform once in recruit school. A poorly loaded bed fails at the next fire.",
+execution:["Rep 1: flat load — all three sections, male coupling at bottom for forward lay — timed","Rep 2: accordion load — folds standing upright — timed","Rep 3: under pressure — load hose after simulated post-fire knockdown, gear on, tired — does quality hold?","Standard: three sections fully loaded in correct configuration in under 8 minutes","Inspect each load: flat? Even? Couplings accessible? Male end correctly oriented?","Debrief: who loaded fastest? Who loaded best? Those are not always the same person."]},
+{id:9026,name:"ENTANGLEMENT — SELF-RESCUE REPS",cat:"Fundamentals",diff:"Hard",time:"12 min",src:"NFPA",
+reps:"3 extrications per FF · Zero visibility",
+equip:"Entanglement prop (wire, cable, drop ceiling grid), Full PPE, SCBA",
+desc:"NFPA 1001 — entanglement self-rescue is a perishable skill. The FF who panics and pushes forward into wire dies. The FF who stops, assesses, and reverses survives.",
+execution:["Rep 1: enter prop in full PPE — encounter wire entanglement — stop — assess — reverse systematically","Rep 2: same but with SCBA on — does the cylinder catch? How do you manage it?","Rep 3: zero visibility — no flashlight — feel your way through the reversal","No forcing forward — any rep where FF pushes through gets restarted","If genuinely stuck: activate PASS, radio MAYDAY — practice the decision to call it","Debrief: which entanglement type caused the most panic? Run more reps on that one."]},
+{id:9027,name:"PUMP PANEL — BLINDFOLD DRILL",cat:"Fundamentals",diff:"Hard",time:"12 min",src:"IFSTA",
+reps:"3 evolutions per driver · Eyes closed",
+equip:"Engine with pump in gear, Attack lines deployed",
+desc:"IFSTA Driver/Operator — the pump panel at 2am in a mask with rain on the panel. If you need to look at the panel to find the discharge valve, your crew is waiting.",
+execution:["Rep 1: driver blindfolded — officer calls 'charge the attack line' — driver locates correct discharge, opens it, sets pressure","Rep 2: 'charge the backup line' — same process","Rep 3: 'tank is low, you have 30 seconds' — driver locates tank-to-pump, opens it, notifies crew","Every lever, valve, and gauge should be findable by touch and position","Rotate drivers — not just the assigned driver","Debrief: which panel control caused the most searching? Practice that one until it's automatic."]},
+{id:9028,name:"SCBA FACEPIECE — SEAL CHECK REPS",cat:"Fundamentals",diff:"Easy",time:"8 min",src:"NFPA",
+reps:"5 checks per FF · Pass/fail on seal every rep",
+equip:"SCBA facepiece, Mirror (optional)",
+desc:"A facepiece that doesn't seal is a facepiece that kills you. A seal check takes 5 seconds. Rep it until it's automatic before every entry.",
+execution:["Rep 1: don facepiece — block low-pressure inlet port — inhale — facepiece should collapse slightly and hold — pass or fail","Rep 2: same but hair is tucked improperly — find the leak","Rep 3: same with beard or facial hair (if applicable) — document the leak and discuss implications","Rep 4: don at speed (part of SCBA donning rep) — seal check without slowing down","Rep 5: partner checks your seal from outside — dual verification","Standard: seal check in under 5 seconds — 100% pass rate before any interior entry","Debrief: how many FFs skipped this step at the last working fire?"]},
+];
+let setsRepsMode=false;
 
-    <script>
-        const canvas = document.getElementById('wheel');
-        const ctx = canvas.getContext('2d');
-        const spinBtn = document.getElementById('spinBtn');
-       
-        let drills = [];
-        let currentAngle = 0;
-        let isSpinning = false;
-        let history = [];
+const allCats=['ALL','Engine Company','Truck Company','Search','Hose Operations','Water Supply','Ladders','SCBA','Survival','Forcible Entry','Ventilation','Rescue & RIT','High-Rise','Tactics','Apparatus','Skills','Special Ops','EMS','General'];
+const activeDiffs=new Set(['Easy','Medium','Hard']);
+let activeCats=new Set(['ALL']),drills=[],filteredDrills=[],history=[],spinCount=0,currentAngle=0,isSpinning=false;
+const canvas=document.getElementById('wheel'),ctx=canvas.getContext('2d');
+const CX=canvas.width/2,CY=canvas.height/2,R=canvas.width/2-8;
+const CAT_COLORS={'Engine Company':['#1e3a5f','#1a4f8a','#2260a8','#163b6e','#1d4e89','#2563eb'],'Truck Company':['#7c1d1d','#991b1b','#b91c1c','#8b1010','#c42727','#dc2626'],'Search':['#134e4a','#0f766e','#0d9488','#115e59','#14b8a6','#1d6460'],'Hose Operations':['#065f46','#047857','#059669','#0f766e','#0d9488','#047857'],'Water Supply':['#164e63','#155e75','#0e7490','#0891b2','#164e63','#1a6080'],'Ladders':['#78350f','#92400e','#b45309','#ca8a04','#d97706','#a16207'],'SCBA':['#312e81','#3730a3','#4338ca','#4f46e5','#5b21b6','#6d28d9'],'Survival':['#4c1d95','#5b21b6','#6d28d9','#7c3aed','#4a1772','#581c87'],'Forcible Entry':['#7c2d12','#9a3412','#c2410c','#d05a10','#b44210','#ea580c'],'Ventilation':['#064e3b','#065f46','#047857','#059669','#0d9488','#14b8a6'],'Rescue & RIT':['#450a0a','#7f1d1d','#991b1b','#b91c1c','#7c1010','#9e1313'],'High-Rise':['#0c4a6e','#075985','#0369a1','#0284c7','#0ea5e9','#0369a1'],'Tactics':['#1c1917','#292524','#44403c','#57534e','#3a3632','#4a4540'],'Apparatus':['#14532d','#166534','#15803d','#16a34a','#1a7a3e','#228b46'],'Skills':['#365314','#3f6212','#4d7c0f','#65a30d','#527014','#4a6612'],'Special Ops':['#3b0764','#581c87','#6b21a8','#7e22ce','#9333ea','#6820a4'],'EMS':['#be123c','#be185d','#9d174d','#d11a7a','#c01573','#a01060'],'General':['#374151','#4b5563','#6b7280','#1e3a5f','#374151','#4b5563']};
+function getColor(cat,i){const p=CAT_COLORS[cat]||CAT_COLORS['General'];return p[i%p.length];}
+function drawWheel(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!filteredDrills.length){ctx.fillStyle='#1a1a1a';ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.fill();ctx.fillStyle='#555';ctx.font='bold 16px Rajdhani,sans-serif';ctx.textAlign='center';ctx.fillText('NO DRILLS MATCH FILTER',CX,CY);return;}
+  const n=filteredDrills.length,slice=(Math.PI*2)/n;
+  for(let i=0;i<n;i++){
+    const s=currentAngle+i*slice,e=s+slice;
+    ctx.beginPath();ctx.moveTo(CX,CY);ctx.arc(CX,CY,R,s,e);ctx.closePath();
+    ctx.fillStyle=getColor(filteredDrills[i].cat,i);ctx.fill();
+    ctx.strokeStyle='#000';ctx.lineWidth=n>40?1:2;ctx.stroke();
+    if(n<=90){
+      ctx.save();ctx.translate(CX,CY);ctx.rotate(s+slice/2);
+      const label=filteredDrills[i].name,maxL=n>60?8:n>40?11:n>25?14:18;
+      const txt=label.length>maxL?label.substring(0,maxL)+'…':label,fs=n>60?7:n>40?9:n>25?11:n>15?13:15;
+      ctx.font=`bold ${fs}px "Black Ops One",sans-serif`;
+      ctx.fillStyle='#fff';ctx.shadowColor='rgba(0,0,0,0.9)';ctx.shadowBlur=4;ctx.textAlign='center';
+      ctx.fillText(txt,R*0.62,4);ctx.restore();
+    }
+  }
+  ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.strokeStyle='#222';ctx.lineWidth=4;ctx.stroke();
+}
+function spinWheel(){
+  if(isSpinning||!filteredDrills.length)return;
+  isSpinning=true;document.getElementById('spinBtn').disabled=true;document.getElementById('hubBtn').textContent='💨';
+  const n=filteredDrills.length,idx=Math.floor(Math.random()*n),slice=(Math.PI*2)/n;
+  const winAngle=idx*slice+slice/2,spins=(5+Math.random()*7)*Math.PI*2;
+  const target=currentAngle+spins+((Math.PI*1.5-winAngle)+Math.PI*2)%(Math.PI*2);
+  const start=currentAngle,t0=performance.now(),dur=4000+Math.random()*1500;
+  function ease(t){if(t<0.25)return 3.5*t*t*t;const p=1-t;return 1-p*p*p*3.5;}
+  function frame(ts){
+    const p=Math.min((ts-t0)/dur,1),e=ease(p);
+    currentAngle=start+(target-start)*e;drawWheel();
+    if(p<1){requestAnimationFrame(frame);return;}
+    currentAngle=target;drawWheel();isSpinning=false;
+    document.getElementById('spinBtn').disabled=false;document.getElementById('hubBtn').textContent='🔥';
+    spinCount++;document.getElementById('spinCount').textContent=spinCount;
+    document.getElementById('lastDrill').textContent=filteredDrills[idx].name.substring(0,22);
+    showResult(filteredDrills[idx]);addHistory(filteredDrills[idx]);
+  }
+  requestAnimationFrame(frame);
+}
+function showResult(d){
+  const sm={WoS:'src-wos',NFPA:'src-nfpa',IFSTA:'src-ifsta',FSRI:'src-fsri',FE:'src-fe'};
+  const sl={WoS:'Work of Search',NFPA:'NFPA 1001',IFSTA:'IFSTA Essentials',FSRI:'UL FSRI',FE:'Fire Engineering'};
+  const sc=d.src?`<span class="src-tag ${sm[d.src]||''}">${sl[d.src]||d.src}</span>`:'';
+  document.getElementById('res-badge').innerHTML=`${d.cat.toUpperCase()} ${sc}`;
+  document.getElementById('res-title').textContent=d.name;
+  document.getElementById('res-meta').innerHTML=`<span class="meta-chip diff-${d.diff}">⚡ ${d.diff}</span><span class="meta-chip">⏱ ${d.time}</span>`;
+  let b='';
+  if(d.reps){b+=`<div class="section-label">🔁 REPS &amp; STANDARD</div><div class="section-content"><span class="reps-chip">${d.reps}</span></div>`;}
+  if(d.desc)b+=`<div class="section-label">PURPOSE</div><div class="section-content">${d.desc}</div>`;
+  if(d.equip){const tags=d.equip.split(',').map(e=>`<span class="equip-tag">${e.trim()}</span>`).join('');b+=`<div class="section-label">EQUIPMENT</div><div class="equip-list">${tags}</div>`;}
+  if(d.objectives)b+=`<div class="section-label">OBJECTIVES</div><div class="section-content">${d.objectives}</div>`;
+  if(d.safety)b+=`<div class="section-label">⚠ SAFETY</div><div class="section-content" style="color:#f87171;">${d.safety}</div>`;
+  if(d.execution&&d.execution.length){const steps=d.execution.map(s=>`<li>${s}</li>`).join('');b+=`<div class="section-label">PLAN OF EXECUTION</div><ol class="exec-steps">${steps}</ol>`;}
+  document.getElementById('res-body').innerHTML=b;
+  document.getElementById('resultOverlay').classList.add('open');
+}
+function closeResult(){document.getElementById('resultOverlay').classList.remove('open');}
+function addHistory(d){history.unshift({name:d.name,cat:d.cat,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});if(history.length>25)history.pop();}
+function openHistory(){const body=document.getElementById('historyBody');body.innerHTML=history.length?history.map(h=>`<div class="history-item"><span class="history-time">${h.time}</span><span class="history-cat">${h.cat}</span><span>${h.name}</span></div>`).join(''):'<p style="color:#555;text-align:center;padding:20px;font-family:Share Tech Mono,monospace;font-size:0.75rem;">NO DRILLS SPUN YET</p>';document.getElementById('historyOverlay').classList.add('open');}
+function openAdd(){document.getElementById('addOverlay').classList.add('open');}
+function saveDrill(){
+  const name=document.getElementById('f-name').value.trim();if(!name){alert('Drill name required.');return;}
+  const exec=document.getElementById('f-exec').value.trim();
+  drills.push({id:Date.now(),name:name.toUpperCase(),cat:document.getElementById('f-cat').value,desc:document.getElementById('f-desc').value.trim(),equip:document.getElementById('f-equip').value.trim(),time:document.getElementById('f-time').value.trim()||'15 min',diff:document.getElementById('f-diff').value,execution:exec?exec.split('\n').filter(s=>s.trim()):[]});
+  ['f-name','f-desc','f-equip','f-time','f-exec'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('addOverlay').classList.remove('open');applyFilter();
+}
+function openManage(){
+  document.getElementById('manageBody').innerHTML=drills.map((d,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1a1a1a;"><span style="font-family:Share Tech Mono,monospace;font-size:0.62rem;color:#444;min-width:24px;">${i+1}</span><span style="flex:1;font-size:0.88rem;font-weight:600;">${d.name}</span><span style="font-size:0.65rem;color:#888;font-family:Share Tech Mono,monospace;">${d.cat}</span><button onclick="removeDrill(${d.id})" style="background:#1a1a1a;border:1px solid #333;color:#ef4444;padding:2px 7px;cursor:pointer;font-size:0.65rem;margin-left:6px;">✕</button></div>`).join('');
+  document.getElementById('manageOverlay').classList.add('open');
+}
+function removeDrill(id){if(!confirm('Remove this drill?'))return;drills=drills.filter(d=>d.id!==id);applyFilter();openManage();}
+function buildCatButtons(){document.getElementById('catFilters').innerHTML=allCats.map(c=>`<button class="cat-btn ${c==='ALL'?'active':''}" data-cat="${c}" onclick="toggleCat(this.dataset.cat)">${c}</button>`).join('');}
+function toggleCat(cat){
+  if(cat==='ALL'){activeCats=new Set(['ALL']);}
+  else{activeCats.delete('ALL');activeCats.has(cat)?activeCats.delete(cat):activeCats.add(cat);if(!activeCats.size)activeCats.add('ALL');}
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',activeCats.has(b.dataset.cat)));
+  applyFilter();
+}
+function toggleDiff(diff){
+  const btn=document.querySelector(`[data-diff="${diff}"]`),cls=`on-${diff.toLowerCase()}`;
+  if(activeDiffs.has(diff)&&activeDiffs.size>1){activeDiffs.delete(diff);btn.classList.remove(cls);}
+  else{activeDiffs.add(diff);btn.classList.add(cls);}
+  applyFilter();
+}
+function applyFilter(){
+  filteredDrills=drills.filter(d=>(activeCats.has('ALL')||activeCats.has(d.cat))&&activeDiffs.has(d.diff));
+  document.getElementById('activeCount').textContent=filteredDrills.length;
+  document.getElementById('activeCountSmall').textContent=filteredDrills.length;
+  drawWheel();
+}
+function resetDefaults(){
+  const pool=setsRepsMode?SETS_REPS_DRILLS:DEFAULT_DRILLS;
+  if(!confirm(`Reset to ${pool.length} drills?`))return;
+  drills=JSON.parse(JSON.stringify(pool));
+  activeCats=new Set(['ALL']);['Easy','Medium','Hard'].forEach(d=>{activeDiffs.add(d);const btn=document.querySelector(`[data-diff="${d}"]`);if(btn)btn.classList.add(`on-${d.toLowerCase()}`);});
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat==='ALL'));
+  applyFilter();
+}
+function resizeCanvas(){const s=Math.min(560,window.innerWidth-32);canvas.style.width=s+'px';canvas.style.height=s+'px';}
 
-        const defaultDrills = [
-            // Work of Search Drills
-            {id:1, name:"ARM DRAG", cat:"Victim Removal", desc:"Build confidence on how to effectively package and evacuate a victim in limited/zero visibility using crossed arm drag technique.", time:"10-15 min", equip:"Full PPE, SCBA, Training building or mock floor layout with pallets, Smoke machine, Victim (Live or dummy), Background noise if applicable, Search tool, 2 Radios for communication, TIC", diff:"Medium", objectives:"Discuss team communication, safety of crossed arm drag, remove victim as team", safety:"Protect live victims, proper lifting, watch exhaustion", execution:"1. Identify victim 2. Call VICTIM x3 3. Radio command 4. Clear entanglements 5. Choose arm drag 6. Remove and radio out"},
-            {id:2, name:"LEG DRAG", cat:"Victim Removal", desc:"Build confidence on how to effectively package and evacuate a victim in limited/zero visibility using leg-first drag.", time:"10-15 min", equip:"Full PPE, SCBA, Training building or mock floor layout with pallets, Smoke machine, Victim (Live or dummy), Background noise if applicable, Search tool, 2 Radios for communication, TIC", diff:"Medium", objectives:"Discuss when search is appropriate, team communication, benefits of leg drag", safety:"Protect live victims, proper lifting, monitor exhaustion", execution:"1. Identify victim 2. Call out 3. Radio 4. Use leg drag 5. Second FF assists or searches"},
-            {id:3, name:"VICTIM ON THE NOZZLE", cat:"Search & Rescue", desc:"Victim removal while operating on or advancing a hoseline.", time:"15 min", equip:"Full PPE, SCBA, Charged hoseline, Nozzle, Victim", diff:"Hard"},
-            {id:4, name:"TAKING A WINDOW", cat:"Search", desc:"Window-initiated search and entry techniques.", time:"12 min", equip:"Full PPE, SCBA, Ladders if needed", diff:"Medium"},
-            {id:5, name:"GROUND LADDER VICTIM REMOVAL", cat:"Ladder", desc:"Remove victim using ground ladder.", time:"15 min", equip:"Ground ladder, Victim, Full PPE", diff:"Hard"},
-            {id:6, name:"ORIENTED SEARCH", cat:"Search", desc:"Oriented search techniques in zero visibility.", time:"20 min", equip:"Full PPE, SCBA, Optional search rope", diff:"Hard"},
-            {id:7, name:"PPE DONNING", cat:"PPE", desc:"Rapid full structural PPE donning under time pressure.", time:"8 min", equip:"Full turnout gear, SCBA", diff:"Easy"},
-            {id:8, name:"SEARCHING WITH A CAN", cat:"Search", desc:"Search techniques using a pressurized water can.", time:"12 min", equip:"Pressurized water can, Full PPE", diff:"Medium"},
-            {id:9, name:"HIGH RISE SEARCH", cat:"High-Rise", desc:"High-rise search operations and standpipe pack usage.", time:"20 min", equip:"High-rise pack, SCBA, Full PPE", diff:"Hard"},
-            {id:10, name:"SEARCHING IN HOARDER CONDITIONS", cat:"Search", desc:"Search techniques in cluttered/hoarder environments.", time:"20 min", equip:"Full PPE, Search tools, TIC", diff:"Hard"},
-            // Original Fire Service Drills
-            {id:11, name:"Forward Lay Attack Line", cat:"Hose", desc:"Deploy 1¾ or 2½ attack line from engine to fire.", time:"15 min", equip:"Attack line, nozzle", diff:"Medium"},
-            {id:12, name:"Reverse Lay with Wye", cat:"Hose", desc:"Lay supply line from hydrant to engine using wye.", time:"20 min", equip:"LDH or 2½, wye", diff:"Medium"},
-            {id:13, name:"Blitz Attack Hose Bundle", cat:"Hose", desc:"Carry pre-connected bundle and advance on fire.", time:"10 min", equip:"Hose bundle", diff:"Easy"},
-            {id:14, name:"Master Stream Deployment", cat:"Hose", desc:"Set up portable or deck gun.", time:"12 min", equip:"Master stream device", diff:"Hard"},
-            {id:15, name:"Relay Pumping Setup", cat:"Hose", desc:"Establish relay between two engines.", time:"25 min", equip:"Multiple engines, hose", diff:"Hard"},
-            {id:16, name:"Ground Ladder Raise (24ft)", cat:"Ladder", desc:"Raise, extend, and heel a 24ft ladder.", time:"8 min", equip:"24ft ladder", diff:"Medium"},
-            {id:17, name:"Roof Ladder Deployment", cat:"Ladder", desc:"Deploy roof ladder over peak.", time:"10 min", equip:"Roof ladder", diff:"Medium"},
-            {id:18, name:"Ladder Bail", cat:"Survival", desc:"Bail out window using ladder.", time:"15 min", equip:"Ladder, dummy", diff:"Hard"},
-            {id:19, name:"SCBA Confidence Maze", cat:"SCBA", desc:"Blackout search in maze.", time:"20 min", equip:"SCBA, maze", diff:"Hard"},
-            {id:20, name:"Mayday Radio Procedure", cat:"Survival", desc:"Transmit Mayday and LUNAR report.", time:"12 min", equip:"Radio", diff:"Medium"},
-            {id:21, name:"Air Management Drill", cat:"SCBA", desc:"Work under load monitoring air.", time:"18 min", equip:"SCBA, stairs", diff:"Medium"},
-            {id:22, name:"Primary Search Patterns", cat:"Search", desc:"Left-hand vs right-hand search.", time:"15 min", equip:"Blackout hoods", diff:"Medium"},
-            {id:23, name:"Victim Drag Techniques", cat:"Rescue", desc:"Multiple firefighter drags.", time:"12 min", equip:"Dummy", diff:"Medium"},
-            {id:24, name:"Forcible Entry Halligan", cat:"Forcible", desc:"Door breaching with halligan and axe.", time:"15 min", equip:"Halligan, axe, door prop", diff:"Hard"},
-            {id:25, name:"RIT Firefighter Down", cat:"Rescue", desc:"Rapid Intervention Team rescue.", time:"25 min", equip:"RIT pack, dummy", diff:"Hard"},
-            {id:26, name:"Hydrant Hookup", cat:"Pump", desc:"Full hydrant hookup.", time:"10 min", equip:"Hydrant wrench", diff:"Easy"},
-            {id:27, name:"Pump Panel Operations", cat:"Pump", desc:"Blindfolded pump operations.", time:"15 min", equip:"Engine", diff:"Medium"},
-            {id:28, name:"Positive Pressure Ventilation", cat:"Vent", desc:"Setup and operation of PPV fan.", time:"12 min", equip:"PPV fan", diff:"Medium"},
-            {id:29, name:"PPE Donning Under Time", cat:"PPE", desc:"Full structural PPE in under 90 seconds.", time:"8 min", equip:"Full turnout gear", diff:"Easy"},
-            {id:30, name:"High-Rise Pack Carry", cat:"Highrise", desc:"Stair climb with standpipe pack.", time:"18 min", equip:"High-rise pack", diff:"Hard"},
-            {id:31, name:"Entanglement Self-Rescue", cat:"Survival", desc:"Escape from wires or debris.", time:"15 min", equip:"Entanglement prop", diff:"Hard"},
-            {id:32, name:"Auto Extrication Tool Ops", cat:"Rescue", desc:"Hurst tool familiarization.", time:"20 min", equip:"Jaws, cutters", diff:"Hard"},
-            {id:33, name:"Daily Apparatus Inspection", cat:"Apparatus", desc:"Blind compartment identification.", time:"10 min", equip:"Engine", diff:"Easy"},
-            {id:34, name:"Radio Communication Scenarios", cat:"Comm", desc:"Simulated difficult radio traffic.", time:"12 min", equip:"Radios", diff:"Medium"},
-            {id:35, name:"Standpipe Operations", cat:"Highrise", desc:"Hookup and advance from standpipe.", time:"20 min", equip:"Standpipe kit", diff:"Hard"},
-            {id:36, name:"Basement Fire Tactics", cat:"Tactics", desc:"Simulated basement fire attack.", time:"18 min", equip:"Hose, SCBA", diff:"Hard"},
-            {id:37, name:"Gloved Fine Motor Tasks", cat:"Skills", desc:"Manipulate small objects with gloves.", time:"8 min", equip:"Nuts, bolts, tools", diff:"Easy"},
-            {id:38, name:"My Baby My Baby Carry", cat:"Survival", desc:"Carry dummy simulating panic.", time:"10 min", equip:"Dummy", diff:"Medium"},
-            {id:39, name:"Ventilation Saw Operations", cat:"Vent", desc:"Roof cut simulation with saw.", time:"15 min", equip:"Saw, roof prop", diff:"Hard"},
-            // Additional drills to reach ~60+
-            {id:40, name:"Window Hang & Bail", cat:"Survival", desc:"Hang from window then drop to ladder.", time:"10 min", equip:"Window prop", diff:"Hard"},
-            {id:41, name:"Master Stream Deployment", cat:"Hose", desc:"Large volume attack setup.", time:"12 min", equip:"Master stream", diff:"Hard"},
-            {id:42, name:"Relay Pumping", cat:"Hose", desc:"Water relay operations.", time:"25 min", equip:"Engines and hose", diff:"Hard"},
-            {id:43, name:"Aerial Ladder Operations", cat:"Ladder", desc:"Aerial ladder use and victim removal.", time:"18 min", equip:"Aerial apparatus", diff:"Hard"},
-            {id:44, name:"Search Size-Up", cat:"Search", desc:"Effective search size-up.", time:"10 min", equip:"None", diff:"Medium"},
-            {id:45, name:"Communication When Searching", cat:"Search", desc:"Radio procedures during search.", time:"12 min", equip:"Radios", diff:"Medium"},
-            {id:46, name:"Window-Initiated Search", cat:"Search", desc:"Search starting from window.", time:"15 min", equip:"Full PPE", diff:"Medium"},
-            {id:47, name:"Beds Cribs & Furniture", cat:"Search", desc:"Systematic search of furniture.", time:"15 min", equip:"Full PPE", diff:"Medium"},
-            {id:48, name:"Masking Up", cat:"SCBA", desc:"Rapid SCBA donning.", time:"8 min", equip:"SCBA", diff:"Easy"},
-            {id:49, name:"Hydraulic Ventilation", cat:"Ventilation", desc:"Hydraulic vent operations.", time:"12 min", equip:"Hose line", diff:"Medium"},
-            {id:50, name:"Targeted Search", cat:"Search", desc:"High probability search patterns.", time:"15 min", equip:"Full PPE", diff:"Medium"},
-            {id:51, name:"Split Search", cat:"Search", desc:"Split search techniques.", time:"12 min", equip:"Full PPE", diff:"Medium"},
-            {id:52, name:"FFRS Data Review", cat:"Search", desc:"Apply Firefighter Rescue Survey data.", time:"10 min", equip:"None", diff:"Medium"},
-            {id:53, name:"Winter Ops Ice", cat:"Special", desc:"Cold weather and ice operations.", time:"20 min", equip:"Full PPE", diff:"Hard"},
-            {id:54, name:"Elevator Fire Operations", cat:"Special", desc:"Elevator fire procedures.", time:"15 min", equip:"Full PPE", diff:"Hard"},
-            {id:55, name:"Wildland Hose Lay", cat:"Wildland", desc:"Wildland hose deployment.", time:"15 min", equip:"Wildland hose", diff:"Medium"},
-            {id:56, name:"Hazmat Awareness Decon", cat:"Hazmat", desc:"Basic decon procedures.", time:"12 min", equip:"Decon kit", diff:"Medium"},
-            {id:57, name:"Night Low-Light Ops", cat:"Special", desc:"Operations in low light.", time:"15 min", equip:"Flashlights", diff:"Medium"},
-            {id:58, name:"Crew Resource Management", cat:"General", desc:"Crew coordination scenarios.", time:"15 min", equip:"Radios", diff:"Medium"},
-            {id:59, name:"Speed vs Safety Tradeoffs", cat:"General", desc:"Decision making under pressure.", time:"12 min", equip:"None", diff:"Medium"},
-            {id:60, name:"Improvised Tool Use", cat:"Skills", desc:"Using available tools creatively.", time:"15 min", equip:"Common tools", diff:"Medium"},
-            {id:61, name:"Standpipe Operations", cat:"Highrise", desc:"Standpipe pack and advance.", time:"20 min", equip:"Standpipe kit", diff:"Hard"},
-            {id:62, name:"Basement Fire Tactics", cat:"Tactics", desc:"Basement fire attack.", time:"18 min", equip:"Hose, SCBA", diff:"Hard"},
-            {id:63, name:"Gloved Fine Motor", cat:"Skills", desc:"Fine motor tasks with gloves.", time:"8 min", equip:"Small objects", diff:"Easy"},
-            {id:64, name:"My Baby My Baby", cat:"Survival", desc:"Panic simulation dummy carry.", time:"10 min", equip:"Dummy", diff:"Medium"},
-            {id:65, name:"Trench Cut Simulation", cat:"Vent", desc:"Trench cut practice.", time:"15 min", equip:"Saw", diff:"Hard"},
-            {id:66, name:"Portable Pump Operations", cat:"Pump", desc:"Portable pump drafting.", time:"15 min", equip:"Portable pump", diff:"Medium"},
-            {id:67, name:"Elevator Rescue", cat:"Special", desc:"Elevator rescue simulation.", time:"20 min", equip:"Full PPE", diff:"Hard"},
-            {id:68, name:"Multi-Story Search", cat:"Search", desc:"Multi-story search tactics.", time:"20 min", equip:"Full PPE", diff:"Hard"},
-            {id:99, name:"CUSTOM DRILL", cat:"General", desc:"Add your own detailed drill here.", time:"Variable", equip:"As needed", diff:"Variable"}
-        ];
+function toggleMode(){
+  setsRepsMode=!setsRepsMode;
+  const btn=document.getElementById('modeToggle');
+  const badge=document.getElementById('setsBadge');
+  const filters=document.getElementById('filterSection');
+  const subtitle=document.querySelector('.subtitle');
+  if(setsRepsMode){
+    btn.classList.add('sets-active');
+    btn.textContent='🔥 FULL DRILL LIBRARY';
+    badge.classList.add('visible');
+    filters.style.display='none';
+    subtitle.textContent='SETS & REPS · FOUNDATIONAL SKILLS · GET YOUR REPS IN';
+    drills=JSON.parse(JSON.stringify(SETS_REPS_DRILLS));
+  } else {
+    btn.classList.remove('sets-active');
+    btn.textContent='⚡ SETS & REPS MODE';
+    badge.classList.remove('visible');
+    filters.style.display='block';
+    subtitle.textContent='V3 · MULTI-SOURCE EDITION · 130+ DRILLS';
+    drills=JSON.parse(JSON.stringify(DEFAULT_DRILLS));
+  }
+  document.getElementById('drillTotal').textContent=drills.length;
+  applyFilter();
+}
 
-        function loadDrills() {
-            const saved = localStorage.getItem('fireDrills');
-            drills = saved ? JSON.parse(saved) : [...defaultDrills];
-            saveDrills();
-        }
-
-        function saveDrills() {
-            localStorage.setItem('fireDrills', JSON.stringify(drills));
-        }
-
-        function resetToDefaults() {
-            if (confirm("Reset to full defaults (85+ drills)?")) {
-                drills = [...defaultDrills];
-                saveDrills();
-                drawWheel();
-                alert("Full library restored!");
-            }
-        }
-
-        function drawWheel() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2;
-            const radius = 280;
-            const numSegments = drills.length;
-            const anglePerSegment = (Math.PI * 2) / numSegments;
-
-            for (let i = 0; i < numSegments; i++) {
-                const startAngle = currentAngle + (i * anglePerSegment);
-                const endAngle = startAngle + anglePerSegment;
-                
-                const hue = (i * 360 / numSegments) % 360;
-                ctx.fillStyle = `hsl(${hue}, 85%, 60%)`;
-                ctx.beginPath();
-                ctx.moveTo(cx, cy);
-                ctx.arc(cx, cy, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fill();
-                
-                ctx.strokeStyle = "#000";
-                ctx.lineWidth = 6;
-                ctx.stroke();
-
-                ctx.save();
-                ctx.translate(cx, cy);
-                ctx.rotate(startAngle + (anglePerSegment / 2) + Math.PI / 2);
-                
-                const text = drills[i].name;
-                let fontSize = 19;
-                if (text.length > 16) fontSize = 16;
-                if (text.length > 20) fontSize = 13;
-                
-                ctx.font = `bold ${fontSize}px 'Press Start 2P'`;
-                ctx.fillStyle = "#000";
-                ctx.textAlign = "center";
-                ctx.shadowColor = "#fff";
-                ctx.shadowBlur = 6;
-                ctx.fillText(text, 0, -radius * 0.62);
-                ctx.restore();
-            }
-            
-            ctx.fillStyle = "#111";
-            ctx.beginPath();
-            ctx.arc(cx, cy, 55, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = "#ff0";
-            ctx.lineWidth = 14;
-            ctx.stroke();
-            
-            ctx.fillStyle = "#f00";
-            ctx.beginPath();
-            ctx.moveTo(cx - 35, 45);
-            ctx.lineTo(cx + 35, 45);
-            ctx.lineTo(cx, 125);
-            ctx.closePath();
-            ctx.fill();
-            ctx.strokeStyle = "#ff0";
-            ctx.lineWidth = 8;
-            ctx.stroke();
-        }
-
-        function spinWheel() {
-            if (isSpinning) return;
-            isSpinning = true;
-            spinBtn.disabled = true;
-            
-            const targetIndex = Math.floor(Math.random() * drills.length);
-            const numSpins = 5 + Math.random() * 4;
-            const targetAngle = currentAngle + (numSpins * Math.PI * 2) - (targetIndex * (Math.PI * 2 / drills.length)) + (Math.PI * 2 / drills.length * 0.5);
-            
-            let startTime = null;
-            const duration = 4200;
-            
-            function animate(timestamp) {
-                if (!startTime) startTime = timestamp;
-                const elapsed = timestamp - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
-                
-                currentAngle = targetAngle * eased;
-                drawWheel();
-                
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    isSpinning = false;
-                    spinBtn.disabled = false;
-                    currentAngle = targetAngle;
-                    drawWheel();
-                    showResult(targetIndex);
-                    addToHistory(drills[targetIndex]);
-                }
-            }
-            requestAnimationFrame(animate);
-        }
-
-        function showResult(index) {
-            const d = drills[index];
-            const content = document.getElementById('resultContent');
-            content.innerHTML = `
-                <h2 style="color:#0f0;">LANDED ON:</h2>
-                <div class="drill-name">${d.name}</div>
-                <p><strong>Category:</strong> ${d.cat} | <strong>Time:</strong> ${d.time} | <strong>Difficulty:</strong> ${d.diff}</p>
-                <p><strong>Equipment:</strong> ${d.equip}</p>
-                <p style="line-height:1.5; margin:15px 0;">${d.desc}</p>
-                ${d.objectives ? `<p><strong>Objectives:</strong><br><pre>${d.objectives}</pre></p>` : ''}
-                ${d.safety ? `<p><strong>Safety:</strong><br><pre>${d.safety}</pre></p>` : ''}
-                ${d.execution ? `<p><strong>Execution:</strong><br><pre>${d.execution}</pre></p>` : ''}
-                <button onclick="closeModal()" style="margin-top:20px; padding:15px 30px;">SPIN AGAIN</button>
-            `;
-            document.getElementById('resultModal').style.display = "flex";
-        }
-
-        function closeModal() {
-            document.getElementById('resultModal').style.display = "none";
-        }
-
-        function addToHistory(drill) {
-            history.unshift({
-                name: drill.name,
-                time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
-            });
-            if (history.length > 15) history.pop();
-            localStorage.setItem('fireHistory', JSON.stringify(history));
-        }
-
-        function toggleHistory() {
-            const list = document.getElementById('historyList');
-            list.innerHTML = history.map(h => `<div>${h.time} — ${h.name}</div>`).join('');
-            document.getElementById('historyModal').style.display = "flex";
-        }
-
-        function closeHistory() {
-            document.getElementById('historyModal').style.display = "none";
-        }
-
-        function showAddDrill() {
-            const name = prompt("New Drill Name:");
-            if (!name) return;
-            const cat = prompt("Category:", "Search");
-            const desc = prompt("Description:", "");
-            const time = prompt("Time:", "15 min");
-            const equip = prompt("Equipment:", "");
-            const diff = prompt("Difficulty:", "Medium");
-            
-            drills.push({
-                id: Date.now(),
-                name: name,
-                cat: cat || "General",
-                desc: desc || "",
-                time: time || "15 min",
-                equip: equip || "",
-                diff: diff || "Medium"
-            });
-            saveDrills();
-            drawWheel();
-            alert("Drill added!");
-        }
-
-        function loadHistory() {
-            const savedHist = localStorage.getItem('fireHistory');
-            if (savedHist) history = JSON.parse(savedHist);
-        }
-
-        function init() {
-            loadDrills();
-            loadHistory();
-            drawWheel();
-           
-            spinBtn.addEventListener('click', spinWheel);
-           
-            document.addEventListener('keydown', e => {
-                if (e.key === " " && !isSpinning) {
-                    e.preventDefault();
-                    spinWheel();
-                }
-            });
-           
-            canvas.addEventListener('touchstart', () => {
-                if (!isSpinning) spinWheel();
-            });
-        }
-
-        window.onload = init;
-    </script>
+function init(){
+  drills=JSON.parse(JSON.stringify(DEFAULT_DRILLS));
+  document.getElementById('drillTotal').textContent=drills.length;
+  buildCatButtons();applyFilter();
+  const names=drills.slice(0,30).map(d=>`<strong>⚡</strong> ${d.name}`).join(' &nbsp;&nbsp; ');
+  document.getElementById('tickerInner').innerHTML=`<span>${names}</span><span>${names}</span>`;
+  resizeCanvas();window.addEventListener('resize',resizeCanvas);
+  document.getElementById('spinBtn').addEventListener('click',spinWheel);
+  document.getElementById('hubBtn').addEventListener('click',spinWheel);
+  canvas.addEventListener('click',()=>{if(!isSpinning)spinWheel();});
+  canvas.addEventListener('touchstart',e=>{e.preventDefault();if(!isSpinning)spinWheel();},{passive:false});
+  document.addEventListener('keydown',e=>{
+    if(e.key===' '&&!isSpinning){e.preventDefault();spinWheel();}
+    if(e.key==='Escape')document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open'));
+  });
+  document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+}
+window.onload=init;
+</script>
 </body>
 </html>
