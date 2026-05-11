@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -104,12 +103,19 @@ canvas#wheel{display:block;border-radius:50%;border:3px solid #222;box-shadow:0 
 .sets-badge{display:none;font-family:'Share Tech Mono',monospace;font-size:0.6rem;text-align:center;letter-spacing:2px;margin-bottom:2px;color:#22c55e;}
 .sets-badge.visible{display:block;}
 .reps-chip{font-family:'Share Tech Mono',monospace;font-size:0.68rem;padding:3px 9px;border:1px solid #22c55e;background:rgba(34,197,94,0.08);color:#22c55e;}
+
+.edit-indicator{font-family:'Share Tech Mono',monospace;font-size:0.58rem;color:var(--yellow);letter-spacing:2px;padding:4px 10px;border:1px solid #444;background:rgba(252,211,77,0.06);display:none;}
+.edit-indicator.visible{display:inline-block;}
+
+.btn-first5{background:var(--dark3);color:#c084fc;border-color:#6b21a8;letter-spacing:1px;}
+.btn-first5:hover{border-color:#c084fc;}
+.btn-first5.active-f5{background:rgba(192,132,252,0.1);border-color:#c084fc;box-shadow:0 0 12px rgba(192,132,252,0.25);}
 </style>
 </head>
 <body>
 <div class="header">
   <h1>🚒 FIRE DRILL WHEEL</h1>
-  <div class="subtitle">V3 · MULTI-SOURCE EDITION · 130+ DRILLS</div>
+  <div class="subtitle">V3 · MULTI-SOURCE EDITION</div>
   <div class="source-badges">
     <span class="badge nfpa">NFPA 1001 JPRs</span>
     <span class="badge ifsta">IFSTA Essentials</span>
@@ -149,6 +155,9 @@ canvas#wheel{display:block;border-radius:50%;border:3px solid #222;box-shadow:0 
       <button class="btn btn-secondary" onclick="openManage()">MANAGE</button>
       <button class="btn btn-danger" onclick="resetDefaults()">RESET</button>
     </div>
+    <div class="btn-row">
+      <button class="btn btn-first5" id="first5Btn" onclick="toggleFirst5()">⏱ FIRST 5 MIN</button>
+    </div>
     <p class="lucky-tip">SPACEBAR · CLICK WHEEL · TAP HUB to spin</p>
   </div>
 </div>
@@ -177,17 +186,17 @@ canvas#wheel{display:block;border-radius:50%;border:3px solid #222;box-shadow:0 
 <div class="overlay" id="addOverlay">
   <div class="modal" style="max-width:500px;">
     <button class="close-btn" onclick="document.getElementById('addOverlay').classList.remove('open')">✕</button>
-    <div class="modal-header"><div class="modal-badge">CUSTOM</div><div class="modal-title">ADD NEW DRILL</div></div>
+    <div class="modal-header"><div class="modal-badge">CUSTOM</div><div class="modal-title" id="addModalTitle">ADD NEW DRILL</div><div style="margin-top:6px;"><span class="edit-indicator" id="editIndicator">✎ EDITING EXISTING DRILL</span></div></div>
     <div class="modal-body">
       <div class="form-group"><label>Drill Name *</label><input id="f-name" type="text"></div>
       <div class="form-group"><label>Category</label>
-        <select id="f-cat"><option>Search</option><option>Victim Removal</option><option>Hose Operations</option><option>Water Supply</option><option>Ladders</option><option>SCBA</option><option>Survival</option><option>Forcible Entry</option><option>Ventilation</option><option>Rescue &amp; RIT</option><option>High-Rise</option><option>Tactics</option><option>Engine Company</option><option>Truck Company</option><option>Apparatus</option><option>Skills</option><option>Special Ops</option><option>EMS</option><option>General</option></select>
+        <select id="f-cat"><option>Search</option><option>Victim Removal</option><option>Hose Operations</option><option>Water Supply</option><option>Ladders</option><option>SCBA</option><option>Survival</option><option>Forcible Entry</option><option>Ventilation</option><option>Rescue &amp; RIT</option><option>High-Rise</option><option>Tactics</option><option>Engine Company</option><option>Truck Company</option><option>Apparatus</option><option>Skills</option><option>Special Ops</option><option>EMS</option><option>General</option><option>Fundamentals</option></select>
       </div>
       <div class="form-group"><label>Purpose / Description *</label><textarea id="f-desc"></textarea></div>
       <div class="form-group"><label>Equipment Needed</label><input id="f-equip" type="text"></div>
       <div class="form-group"><label>Time Estimate</label><input id="f-time" type="text" placeholder="15 min"></div>
       <div class="form-group"><label>Difficulty</label><select id="f-diff"><option>Easy</option><option selected>Medium</option><option>Hard</option></select></div>
-      <div class="form-group"><label>Plan of Execution (one step per line)</label><textarea id="f-exec" style="min-height:80px;"></textarea></div>
+      <div class="form-group"><label>Sets &amp; Reps Standard (optional)</label><input id="f-reps" type="text" placeholder="e.g. 5 reps per FF · Target: sub-60 sec"></div><div class="form-group"><label>Plan of Execution (one step per line)</label><textarea id="f-exec" style="min-height:80px;"></textarea></div><input type="hidden" id="f-editid">
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="document.getElementById('addOverlay').classList.remove('open')">CANCEL</button>
@@ -710,8 +719,58 @@ reps:"5 checks per FF · Pass/fail on seal every rep",
 equip:"SCBA facepiece, Mirror (optional)",
 desc:"A facepiece that doesn't seal is a facepiece that kills you. A seal check takes 5 seconds. Rep it until it's automatic before every entry.",
 execution:["Rep 1: don facepiece — block low-pressure inlet port — inhale — facepiece should collapse slightly and hold — pass or fail","Rep 2: same but hair is tucked improperly — find the leak","Rep 3: same with beard or facial hair (if applicable) — document the leak and discuss implications","Rep 4: don at speed (part of SCBA donning rep) — seal check without slowing down","Rep 5: partner checks your seal from outside — dual verification","Standard: seal check in under 5 seconds — 100% pass rate before any interior entry","Debrief: how many FFs skipped this step at the last working fire?"]},
+{id:9029,name:"PIKE POLE — CEILING PULL REPS",cat:"Fundamentals",diff:"Medium",time:"10 min",src:"IFSTA",
+reps:"3 full ceiling pulls per FF · Identify void, pull, inspect",
+equip:"Pike pole or rubbish hook, Acquired structure or ceiling prop, Full PPE",
+desc:"IFSTA — pulling ceiling for fire extension check and overhaul. Technique matters: pull toward you, not over you. Know what you're looking for before the first pull.",
+execution:["Rep 1: identify target area via TIC — pull ceiling at hot spot — inspect void space above","Rep 2: pull ceiling in adjacent room — check for extension — radio findings","Rep 3: coordinated pull — one FF pulls, one with TIC reads the void in real time","Hook placement: set hook firmly, pull down and toward you — control the debris","Read what falls: dry insulation (no extension) vs wet or charred (extension present)","Debrief: who pulled overhead and got debris in their facepiece? That's the rep that teaches."]},
+{id:9030,name:"CONTROLLED BREATHING — STRESS REPS",cat:"Fundamentals",diff:"Medium",time:"10 min",src:"NFPA",
+reps:"5 rounds per FF · Tactical breathing under physical load",
+equip:"SCBA, Physical activity (stair or hose drag)",
+desc:"Controlled breathing reduces air consumption and panic under stress. The FF who breathes tactically inside a structure outlasts the one who doesn't by 30-40% more air.",
+execution:["Rep 1: after stair climb — stop, deliberately slow breathing to 4-count inhale, 4-count exhale","Rep 2: same after hose drag — monitor how fast your breathing returns to controlled rate","Rep 3: while moving — maintain controlled breathing pace during active work","Rep 4: mask alarm sounding simulation — control breathing while transmitting MAYDAY","Rep 5: partner observes chest rise — coaching on pace","Standard: return to controlled rate within 30 seconds of peak exertion","Debrief: your air budget is directly tied to your breathing discipline. This is trainable."]},
+{id:9031,name:"RADIO DISCIPLINE — FIREGROUND REPS",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"FE",
+reps:"5 transmissions per FF · Say it in under 10 seconds",
+equip:"Radios, Scenario cards",
+desc:"Fire Engineering — fireground radio discipline. Unit, location, action, finding. Every transmission under 10 seconds. No filler words. Clear channel is a life safety issue.",
+execution:["Rep 1: entry report — unit, location, action, conditions — timed under 10 sec","Rep 2: progress report — position update, search status — timed under 10 sec","Rep 3: condition change — 'Engine 1 to command, conditions deteriorating, floor 2 rear, going defensive' — timed","Rep 4: resource request — unit, what you need, where to send it — timed","Rep 5: all-clear — floor searched, conditions, exiting — timed","Failure: saying 'um', 'uh', repeating yourself, or exceeding 10 sec without key info = restart","Debrief: radio clarity saves lives. Every wasted word blocks a MAYDAY."]},
+{id:9032,name:"GROUND LADDER CARRY — TECHNIQUES",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"IFSTA",
+reps:"3 carries per FF · All methods",
+equip:"24ft extension ladder, Confined space or obstacle course",
+desc:"IFSTA Essentials — carrying a ladder to the target efficiently. Low shoulder, high shoulder, and alley carry. Know which to use before you pick it up.",
+execution:["Rep 1: low shoulder carry — 24ft — from apparatus to building wall, 100ft","Rep 2: high shoulder carry — same route — compare speed and stability","Rep 3: alley carry — navigate through 4ft gap without hitting walls","Add: carry with tools in other hand — does technique hold?","Assign: each FF picks up ladder and calls their carry method before moving — no coaching","Debrief: low shoulder is faster, high shoulder sees farther — know when to use each"]},
+{id:9033,name:"GROUND LADDER — HEEL & FOOT",cat:"Fundamentals",diff:"Easy",time:"8 min",src:"NFPA",
+reps:"5 heeling reps per FF · Both foot and hand heel",
+equip:"24ft extension ladder, Wall",
+desc:"NFPA 1001 — heeling a ladder is a critical support skill. A ladder that kicks is a ladder that kills. Rep it until it's automatic.",
+execution:["Rep 1: foot heel — place instep against butt of ladder, lean into base, hands on rung for pressure","Rep 2: hand heel — kneel at butt, both hands pressing butt down — when is this used?","Rep 3: body weight heel — for heavy ladders or when FF is pulling up","Heeling FF faces the ladder — never turns away","Debrief: when is foot heel preferred over hand heel? (Answer: almost always — keeps FF upright and mobile)","Bonus: heel while a second FF raises the 35ft — heeling a long ladder is a different feel"]},
+{id:9034,name:"HOSE COUPLING — CONNECT & EXTEND",cat:"Fundamentals",diff:"Easy",time:"10 min",src:"NFPA",
+reps:"5 connections per FF · Gloves on, timed under 30 sec",
+equip:"Multiple hose sections with male and female couplings, Timer",
+desc:"NFPA 1001 — connecting hose couplings with gloves on in the dark. Thread identification, gasket check, hand-tight connection. The coupling that leaks or won't connect wastes water and time.",
+execution:["Rep 1: connect male to female — identify threads — seat and hand-tighten — timed","Rep 2: same but one coupling is dirty or has debris — clean and connect","Rep 3: night rep — connect by feel with no flashlight","Rep 4: extend a charged line — connect additional section without losing significant pressure","Rep 5: identify a worn or missing gasket — replace it — connect","Standard: correct connection under 30 seconds with gloves, every rep","Debrief: how many FFs can identify male vs female coupling by feel alone?"]},
+{id:9035,name:"SELF-CONTAINED RESCUE — LOW PROFILE",cat:"Fundamentals",diff:"Hard",time:"12 min",src:"NFPA",
+reps:"3 evolutions per FF · SCBA on, tight spaces",
+equip:"Full PPE, SCBA, Tight space prop or furniture obstacle, Training building",
+desc:"NFPA 1001 — moving through tight spaces with SCBA. Cylinder snag, hood snag, and profile reduction technique. The FF who panics in a tight space dies there.",
+execution:["Rep 1: low crawl through tight horizontal space — SCBA cylinder profile managed","Rep 2: SCBA snag on obstacle — stop, back out, reposition, advance","Rep 3: tight vertical space (doorway or window) — roll-through technique","Key: when SCBA snags, the answer is always backward — never force forward","Cylinder over the shoulder technique for extremely tight spaces — when and how","Debrief: which snag caused the most time loss? That obstacle type gets added to your prop."]},
+{id:9036,name:"INCIDENT COMMAND — INITIAL RADIO REPORT",cat:"Fundamentals",diff:"Medium",time:"10 min",src:"FE",
+reps:"5 reports per officer · Complete in under 30 seconds",
+equip:"Radios, Scenario photos or building tour",
+desc:"Fire Engineering — initial radio report on arrival establishes command and sets the operational tone. A poor first report creates confusion for the next 20 minutes. Rep it.",
+execution:["Format: unit arriving, address, building description, fire conditions, action taken, command established","Rep 1: single-family residential, smoke from 2nd floor — transmit arrival report","Rep 2: commercial structure, fire through roof — transmit","Rep 3: multi-family, unknown fire location, life hazard visible — transmit","Rep 4: car fire with exposure — transmit","Rep 5: nothing showing, investigating — transmit","Timed: complete report in under 30 seconds","Debrief: did the report give incoming units enough to plan their assignment?"]},
+{id:9037,name:"VICTIM PACKAGING — STOKES & WEBBING",cat:"Fundamentals",diff:"Medium",time:"12 min",src:"IFSTA",
+reps:"3 packages per crew · Timed",
+equip:"Stokes basket or backboard, Webbing, Training dummy",
+desc:"IFSTA — rapid victim packaging for removal over distance or down stairs. A properly packaged victim moves faster and with less risk than an improperly packaged one.",
+execution:["Rep 1: log roll victim onto backboard — strap at chest, hips, knees — carry ready","Rep 2: webbing harness — create chest harness from webbing — connect for drag","Rep 3: stokes basket — load victim — prepare for stair descent or aerial removal","Time each rep: packaged and ready to move in under 90 seconds","Add: package in limited space (hallway width) — technique adapts","Debrief: which packaging method is fastest for your most common scenario?"]},
+{id:9038,name:"RAPID WATER — TANK WATER ATTACK",cat:"Fundamentals",diff:"Medium",time:"10 min",src:"NFPA",
+reps:"3 evolutions per crew · Establish attack before water supply",
+equip:"Engine with tank water, 1¾ attack line, Timer",
+desc:"NFPA 1410 — initial attack from tank water while water supply is being established. Know your tank capacity and your flow rate. Know how long you have before the tank is dry.",
+execution:["Rep 1: arrive, stretch 1¾, attack from tank water — officer calls tank level every 30 seconds","Rep 2: same but driver monitors and calls 'tank at 50%' and '25%' — crew adjusts flow","Rep 3: tank runs dry during simulated attack — transition to supply — how smooth is it?","Standard: 500-gallon tank at 125 GPM = 4 minutes. Do your crew know your apparatus numbers?","Debrief: when the tank hits 25%, what is the SOP? Who calls it and who acts on it?"]},
 ];
-let setsRepsMode=false;
+let setsRepsMode=false,first5Mode=false;
 
 const allCats=['ALL','Engine Company','Truck Company','Search','Hose Operations','Water Supply','Ladders','SCBA','Survival','Forcible Entry','Ventilation','Rescue & RIT','High-Rise','Tactics','Apparatus','Skills','Special Ops','EMS','General'];
 const activeDiffs=new Set(['Easy','Medium','Hard']);
@@ -780,19 +839,52 @@ function showResult(d){
 function closeResult(){document.getElementById('resultOverlay').classList.remove('open');}
 function addHistory(d){history.unshift({name:d.name,cat:d.cat,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});if(history.length>25)history.pop();}
 function openHistory(){const body=document.getElementById('historyBody');body.innerHTML=history.length?history.map(h=>`<div class="history-item"><span class="history-time">${h.time}</span><span class="history-cat">${h.cat}</span><span>${h.name}</span></div>`).join(''):'<p style="color:#555;text-align:center;padding:20px;font-family:Share Tech Mono,monospace;font-size:0.75rem;">NO DRILLS SPUN YET</p>';document.getElementById('historyOverlay').classList.add('open');}
-function openAdd(){document.getElementById('addOverlay').classList.add('open');}
+function openAdd(drill){
+  const editing = drill && drill.id;
+  document.getElementById('addModalTitle').textContent = editing ? 'EDIT DRILL' : 'ADD NEW DRILL';
+  document.getElementById('editIndicator').classList.toggle('visible', !!editing);
+  document.getElementById('f-name').value = editing ? drill.name : '';
+  document.getElementById('f-cat').value = editing ? (drill.cat||'Search') : 'Search';
+  document.getElementById('f-desc').value = editing ? (drill.desc||'') : '';
+  document.getElementById('f-equip').value = editing ? (drill.equip||'') : '';
+  document.getElementById('f-time').value = editing ? (drill.time||'') : '';
+  document.getElementById('f-diff').value = editing ? (drill.diff||'Medium') : 'Medium';
+  document.getElementById('f-exec').value = editing ? (drill.execution||[]).join('\n') : '';
+  document.getElementById('f-reps').value = editing ? (drill.reps||'') : '';
+  document.getElementById('f-editid').value = editing ? drill.id : '';
+  document.getElementById('addOverlay').classList.add('open');
+}
 function saveDrill(){
   const name=document.getElementById('f-name').value.trim();if(!name){alert('Drill name required.');return;}
   const exec=document.getElementById('f-exec').value.trim();
-  drills.push({id:Date.now(),name:name.toUpperCase(),cat:document.getElementById('f-cat').value,desc:document.getElementById('f-desc').value.trim(),equip:document.getElementById('f-equip').value.trim(),time:document.getElementById('f-time').value.trim()||'15 min',diff:document.getElementById('f-diff').value,execution:exec?exec.split('\n').filter(s=>s.trim()):[]});
-  ['f-name','f-desc','f-equip','f-time','f-exec'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('addOverlay').classList.remove('open');applyFilter();
+  const editId=document.getElementById('f-editid').value;
+  const obj={name:name.toUpperCase(),cat:document.getElementById('f-cat').value,desc:document.getElementById('f-desc').value.trim(),equip:document.getElementById('f-equip').value.trim(),time:document.getElementById('f-time').value.trim()||'15 min',diff:document.getElementById('f-diff').value,reps:document.getElementById('f-reps').value.trim(),execution:exec?exec.split('\n').filter(s=>s.trim()):[]};
+  if(editId){
+    const idx=drills.findIndex(d=>String(d.id)===String(editId));
+    if(idx>-1){drills[idx]={...drills[idx],...obj};}
+  } else {
+    drills.push({id:Date.now(),...obj});
+  }
+  saveToDB();
+  document.getElementById('addOverlay').classList.remove('open');
+  applyFilter();
 }
 function openManage(){
-  document.getElementById('manageBody').innerHTML=drills.map((d,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1a1a1a;"><span style="font-family:Share Tech Mono,monospace;font-size:0.62rem;color:#444;min-width:24px;">${i+1}</span><span style="flex:1;font-size:0.88rem;font-weight:600;">${d.name}</span><span style="font-size:0.65rem;color:#888;font-family:Share Tech Mono,monospace;">${d.cat}</span><button onclick="removeDrill(${d.id})" style="background:#1a1a1a;border:1px solid #333;color:#ef4444;padding:2px 7px;cursor:pointer;font-size:0.65rem;margin-left:6px;">✕</button></div>`).join('');
+  document.getElementById('manageBody').innerHTML=drills.map((d,i)=>`<div style="display:flex;align-items:center;gap:6px;padding:7px 0;border-bottom:1px solid #1a1a1a;">
+    <span style="font-family:Share Tech Mono,monospace;font-size:0.6rem;color:#444;min-width:22px;">${i+1}</span>
+    <span style="flex:1;font-size:0.86rem;font-weight:600;line-height:1.2;">${d.name}</span>
+    <span style="font-size:0.6rem;color:#666;font-family:Share Tech Mono,monospace;white-space:nowrap;">${d.cat}</span>
+    <button onclick="editDrill(${d.id})" style="background:#1a1a1a;border:1px solid #444;color:#fcd34d;padding:2px 8px;cursor:pointer;font-size:0.65rem;font-family:Share Tech Mono,monospace;white-space:nowrap;">✎ EDIT</button>
+    <button onclick="removeDrill(${d.id})" style="background:#1a1a1a;border:1px solid #333;color:#ef4444;padding:2px 7px;cursor:pointer;font-size:0.65rem;font-family:Share Tech Mono,monospace;">✕</button>
+  </div>`).join('');
   document.getElementById('manageOverlay').classList.add('open');
 }
-function removeDrill(id){if(!confirm('Remove this drill?'))return;drills=drills.filter(d=>d.id!==id);applyFilter();openManage();}
+function removeDrill(id){if(!confirm('Remove this drill?'))return;drills=drills.filter(d=>d.id!==id);saveToDB();applyFilter();openManage();}
+function editDrill(id){
+  const d=drills.find(dr=>dr.id===id);if(!d)return;
+  document.getElementById('manageOverlay').classList.remove('open');
+  openAdd(d);
+}
 function buildCatButtons(){document.getElementById('catFilters').innerHTML=allCats.map(c=>`<button class="cat-btn ${c==='ALL'?'active':''}" data-cat="${c}" onclick="toggleCat(this.dataset.cat)">${c}</button>`).join('');}
 function toggleCat(cat){
   if(cat==='ALL'){activeCats=new Set(['ALL']);}
@@ -807,14 +899,20 @@ function toggleDiff(diff){
   applyFilter();
 }
 function applyFilter(){
-  filteredDrills=drills.filter(d=>(activeCats.has('ALL')||activeCats.has(d.cat))&&activeDiffs.has(d.diff));
+  if(first5Mode){first5Mode=false;const b=document.getElementById('first5Btn');if(b)b.classList.remove('active-f5');}
+  if(setsRepsMode){
+    filteredDrills=drills.filter(d=>activeDiffs.has(d.diff));
+  } else {
+    filteredDrills=drills.filter(d=>(activeCats.has('ALL')||activeCats.has(d.cat))&&activeDiffs.has(d.diff));
+  }
   document.getElementById('activeCount').textContent=filteredDrills.length;
   document.getElementById('activeCountSmall').textContent=filteredDrills.length;
   drawWheel();
 }
 function resetDefaults(){
   const pool=setsRepsMode?SETS_REPS_DRILLS:DEFAULT_DRILLS;
-  if(!confirm(`Reset to ${pool.length} drills?`))return;
+  if(!confirm(`Reset to ${pool.length} drills? This will clear all edits and custom drills in this library.`))return;
+  try{localStorage.removeItem(setsRepsMode?DB_KEY_SR:DB_KEY_MAIN);}catch(e){}
   drills=JSON.parse(JSON.stringify(pool));
   activeCats=new Set(['ALL']);['Easy','Medium','Hard'].forEach(d=>{activeDiffs.add(d);const btn=document.querySelector(`[data-diff="${d}"]`);if(btn)btn.classList.add(`on-${d.toLowerCase()}`);});
   document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat==='ALL'));
@@ -822,6 +920,44 @@ function resetDefaults(){
 }
 function resizeCanvas(){const s=Math.min(560,window.innerWidth-32);canvas.style.width=s+'px';canvas.style.height=s+'px';}
 
+
+const DB_KEY_MAIN='fdw_custom_drills';
+const DB_KEY_SR='fdw_custom_sr_drills';
+function saveToDB(){
+  const key=setsRepsMode?DB_KEY_SR:DB_KEY_MAIN;
+  // only save IDs that are custom (id > 9999 or not in defaults)
+  const defaultIds=new Set((setsRepsMode?SETS_REPS_DRILLS:DEFAULT_DRILLS).map(d=>d.id));
+  const custom=drills.filter(d=>!defaultIds.has(d.id));
+  const edited=drills.filter(d=>defaultIds.has(d.id)&&JSON.stringify(d)!==JSON.stringify((setsRepsMode?SETS_REPS_DRILLS:DEFAULT_DRILLS).find(x=>x.id===d.id)));
+  try{localStorage.setItem(key,JSON.stringify({custom,edited}));}catch(e){}
+}
+function loadFromDB(pool,isSetMode){
+  const key=isSetMode?DB_KEY_SR:DB_KEY_MAIN;
+  try{
+    const saved=JSON.parse(localStorage.getItem(key)||'null');
+    if(!saved)return pool;
+    let result=pool.map(d=>{
+      const edit=saved.edited&&saved.edited.find(e=>e.id===d.id);
+      return edit?{...d,...edit}:d;
+    });
+    if(saved.custom&&saved.custom.length)result=[...result,...saved.custom];
+    return result;
+  }catch(e){return pool;}
+}
+function toggleFirst5(){
+  first5Mode=!first5Mode;
+  const btn=document.getElementById('first5Btn');
+  btn.classList.toggle('active-f5',first5Mode);
+  if(first5Mode){
+    // bypass normal filter — show only first-5-min drills
+    filteredDrills=drills.filter(d=>d.name.includes('FIRST FIVE MINUTES'));
+    document.getElementById('activeCount').textContent=filteredDrills.length;
+    document.getElementById('activeCountSmall').textContent=filteredDrills.length;
+    drawWheel();
+  } else {
+    applyFilter();
+  }
+}
 function toggleMode(){
   setsRepsMode=!setsRepsMode;
   const btn=document.getElementById('modeToggle');
@@ -834,21 +970,21 @@ function toggleMode(){
     badge.classList.add('visible');
     filters.style.display='none';
     subtitle.textContent='SETS & REPS · FOUNDATIONAL SKILLS · GET YOUR REPS IN';
-    drills=JSON.parse(JSON.stringify(SETS_REPS_DRILLS));
+    drills=loadFromDB(JSON.parse(JSON.stringify(SETS_REPS_DRILLS)),true);
   } else {
     btn.classList.remove('sets-active');
     btn.textContent='⚡ SETS & REPS MODE';
     badge.classList.remove('visible');
     filters.style.display='block';
-    subtitle.textContent='V3 · MULTI-SOURCE EDITION · 130+ DRILLS';
-    drills=JSON.parse(JSON.stringify(DEFAULT_DRILLS));
+    subtitle.textContent='V3 · MULTI-SOURCE EDITION';
+    drills=loadFromDB(JSON.parse(JSON.stringify(DEFAULT_DRILLS)),false);
   }
   document.getElementById('drillTotal').textContent=drills.length;
   applyFilter();
 }
 
 function init(){
-  drills=JSON.parse(JSON.stringify(DEFAULT_DRILLS));
+  drills=loadFromDB(JSON.parse(JSON.stringify(DEFAULT_DRILLS)),false);
   document.getElementById('drillTotal').textContent=drills.length;
   buildCatButtons();applyFilter();
   const names=drills.slice(0,30).map(d=>`<strong>⚡</strong> ${d.name}`).join(' &nbsp;&nbsp; ');
